@@ -1,11 +1,11 @@
-package ca.bcit.comp2526.a2a.traits;
+package ca.bcit.comp2526.a2b.traits;
 
 /**
- * TraitType.
+ * Trait.
  *
  * @author  Wei Zhou
  * @version 2016-11-06
  * @since   2016-11-06
  */
-public enum TraitType {
+public interface Trait {
 }

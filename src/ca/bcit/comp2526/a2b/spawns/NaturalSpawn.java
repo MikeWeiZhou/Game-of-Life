@@ -1,6 +1,6 @@
-package ca.bcit.comp2526.a2a.spawns;
+package ca.bcit.comp2526.a2b.spawns;
 
-import ca.bcit.comp2526.a2a.lifeforms.LifeformType;
+import ca.bcit.comp2526.a2b.lifeforms.LifeformType;
 
 /**
  * NaturalSpawn.

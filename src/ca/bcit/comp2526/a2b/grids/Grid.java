@@ -1,4 +1,4 @@
-package ca.bcit.comp2526.a2a.grids;
+package ca.bcit.comp2526.a2b.grids;
 
 import java.awt.Dimension;
 

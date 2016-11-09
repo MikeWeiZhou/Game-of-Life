@@ -1,9 +1,9 @@
-package ca.bcit.comp2526.a2a;
+package ca.bcit.comp2526.a2b;
 
-import ca.bcit.comp2526.a2a.grids.Node;
-import ca.bcit.comp2526.a2a.lifeforms.Lifeform;
-import ca.bcit.comp2526.a2a.grids.Grid;
-import ca.bcit.comp2526.a2a.spawns.Spawn;
+import ca.bcit.comp2526.a2b.grids.Node;
+import ca.bcit.comp2526.a2b.lifeforms.Lifeform;
+import ca.bcit.comp2526.a2b.grids.Grid;
+import ca.bcit.comp2526.a2b.spawns.Spawn;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -1,6 +1,6 @@
-package ca.bcit.comp2526.a2a.actions;
+package ca.bcit.comp2526.a2b.actions;
 
-import ca.bcit.comp2526.a2a.lifeforms.Lifeform;
+import ca.bcit.comp2526.a2b.lifeforms.Lifeform;
 
 /**
  * Move.

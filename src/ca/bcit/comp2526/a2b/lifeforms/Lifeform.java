@@ -1,10 +1,10 @@
-package ca.bcit.comp2526.a2a.lifeforms;
+package ca.bcit.comp2526.a2b.lifeforms;
 
-import ca.bcit.comp2526.a2a.traits.Trait;
-import ca.bcit.comp2526.a2a.traits.TraitType;
-import ca.bcit.comp2526.a2a.actions.Action;
-import ca.bcit.comp2526.a2a.actions.ActionType;
-import ca.bcit.comp2526.a2a.grids.Node;
+import ca.bcit.comp2526.a2b.traits.Trait;
+import ca.bcit.comp2526.a2b.traits.TraitType;
+import ca.bcit.comp2526.a2b.actions.Action;
+import ca.bcit.comp2526.a2b.actions.ActionType;
+import ca.bcit.comp2526.a2b.grids.Node;
 
 import java.awt.Color;
 import java.util.*;

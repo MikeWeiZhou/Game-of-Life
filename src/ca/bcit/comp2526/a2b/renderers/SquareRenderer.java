@@ -1,14 +1,10 @@
-package ca.bcit.comp2526.a2a.renderers;
+package ca.bcit.comp2526.a2b.renderers;
 
-import ca.bcit.comp2526.a2a.World;
-import ca.bcit.comp2526.a2a.grids.Grid;
-import ca.bcit.comp2526.a2a.grids.Node;
-import ca.bcit.comp2526.a2a.lifeforms.Lifeform;
+import ca.bcit.comp2526.a2b.World;
+import ca.bcit.comp2526.a2b.grids.Grid;
+import ca.bcit.comp2526.a2b.lifeforms.Lifeform;
 
 import javax.swing.JFrame;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.Rectangle2D;

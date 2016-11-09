@@ -1,8 +1,8 @@
-package ca.bcit.comp2526.a2a.spawns;
+package ca.bcit.comp2526.a2b.spawns;
 
-import ca.bcit.comp2526.a2a.grids.Node;
-import ca.bcit.comp2526.a2a.lifeforms.Lifeform;
-import ca.bcit.comp2526.a2a.lifeforms.LifeformType;
+import ca.bcit.comp2526.a2b.grids.Node;
+import ca.bcit.comp2526.a2b.lifeforms.Lifeform;
+import ca.bcit.comp2526.a2b.lifeforms.LifeformType;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -26,7 +26,7 @@ public abstract class Spawn {
 
     static {
         classNames  = new HashMap<LifeformType, String>();
-        packageName = "ca.bcit.comp2526.a2a.lifeforms";
+        packageName = "ca.bcit.comp2526.a2b.lifeforms";
         random      = new Random();
 
         classNames.put(LifeformType.LIFELESS,  "Lifeless");

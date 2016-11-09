@@ -1,4 +1,4 @@
-package ca.bcit.comp2526.a2a.actions;
+package ca.bcit.comp2526.a2b.actions;
 
 /**
  * ActionType.

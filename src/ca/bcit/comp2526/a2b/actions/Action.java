@@ -1,6 +1,6 @@
-package ca.bcit.comp2526.a2a.actions;
+package ca.bcit.comp2526.a2b.actions;
 
-import ca.bcit.comp2526.a2a.lifeforms.Lifeform;
+import ca.bcit.comp2526.a2b.lifeforms.Lifeform;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +18,7 @@ public abstract class Action {
     private static final Map<ActionType, Action> actions;
 
     static {
-        packageName = "ca.bcit.comp2526.a2a.actions";
+        packageName = "ca.bcit.comp2526.a2b.actions";
         actions     = new HashMap<ActionType, Action>();
         actions.put(ActionType.MOVE, createActionObj("Move"));
 //        actions.put(ActionType.EAT,  createActionObj("Eat"));

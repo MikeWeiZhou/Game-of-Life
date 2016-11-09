@@ -1,4 +1,4 @@
-package ca.bcit.comp2526.a2a.lifeforms;
+package ca.bcit.comp2526.a2b.lifeforms;
 
 /**
  * LifeformType.

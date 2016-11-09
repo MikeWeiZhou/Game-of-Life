@@ -1,6 +1,4 @@
-package ca.bcit.comp2526.a2a.grids;
-
-import ca.bcit.comp2526.a2a.terrain.Terrain;
+package ca.bcit.comp2526.a2b.grids;
 
 import java.awt.Point;
 import java.util.HashMap;

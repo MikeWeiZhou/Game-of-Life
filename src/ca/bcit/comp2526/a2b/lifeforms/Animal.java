@@ -1,8 +1,6 @@
-package ca.bcit.comp2526.a2a.lifeforms;
+package ca.bcit.comp2526.a2b.lifeforms;
 
-import ca.bcit.comp2526.a2a.grids.Node;
-
-import java.awt.*;
+import ca.bcit.comp2526.a2b.grids.Node;
 
 /**
  * Animal.

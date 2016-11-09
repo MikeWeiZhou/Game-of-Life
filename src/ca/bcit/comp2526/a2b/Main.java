@@ -1,11 +1,11 @@
-package ca.bcit.comp2526.a2a;
+package ca.bcit.comp2526.a2b;
 
-import ca.bcit.comp2526.a2a.grids.Grid;
-import ca.bcit.comp2526.a2a.grids.SquareGrid;
-import ca.bcit.comp2526.a2a.spawns.NaturalSpawn;
-import ca.bcit.comp2526.a2a.spawns.Spawn;
-import ca.bcit.comp2526.a2a.renderers.Renderer;
-import ca.bcit.comp2526.a2a.renderers.SquareRenderer;
+import ca.bcit.comp2526.a2b.grids.Grid;
+import ca.bcit.comp2526.a2b.grids.SquareGrid;
+import ca.bcit.comp2526.a2b.spawns.NaturalSpawn;
+import ca.bcit.comp2526.a2b.spawns.Spawn;
+import ca.bcit.comp2526.a2b.renderers.Renderer;
+import ca.bcit.comp2526.a2b.renderers.SquareRenderer;
 
 import java.awt.Dimension;
 import java.awt.Point;

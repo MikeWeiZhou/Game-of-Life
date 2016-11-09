@@ -1,4 +1,4 @@
-package ca.bcit.comp2526.a2a.terrain;
+package ca.bcit.comp2526.a2b.terrain;
 
 /**
  * Terrain.
