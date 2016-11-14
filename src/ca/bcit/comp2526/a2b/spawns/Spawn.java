@@ -1,98 +1,140 @@
 package ca.bcit.comp2526.a2b.spawns;
 
+import ca.bcit.comp2526.a2b.World;
 import ca.bcit.comp2526.a2b.grids.Node;
+import ca.bcit.comp2526.a2b.grids.Terrain;
 import ca.bcit.comp2526.a2b.lifeforms.Lifeform;
 import ca.bcit.comp2526.a2b.lifeforms.LifeformType;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Spawn.
  *
  * @author  Wei Zhou
- * @version 2016-11-08
+ * @version 2016-11-13
  * @since   2016-11-06
  */
 public abstract class Spawn {
 
-    private static final Map<LifeformType, String> classNames;
-    private static final String packageName;
-    private static final Random random;
+    private static final String lifeformPkgName;
+    private static final Map<LifeformType, String> lifeformClassNames;
 
     static {
-        classNames  = new HashMap<LifeformType, String>();
-        packageName = "ca.bcit.comp2526.a2b.lifeforms";
-        random      = new Random();
+        lifeformPkgName  = "ca.bcit.comp2526.a2b.lifeforms";
 
-        classNames.put(LifeformType.LIFELESS,  "Lifeless");
-        classNames.put(LifeformType.PLANT,     "Plant");
-        classNames.put(LifeformType.HERBIVORE, "Herbivore");
+        lifeformClassNames = new HashMap<LifeformType, String>();
+        lifeformClassNames.put(LifeformType.PLANT,     "Plant");
+        lifeformClassNames.put(LifeformType.HERBIVORE, "Herbivore");
+        lifeformClassNames.put(LifeformType.OMNIVORE,  "Omnivore");
+        lifeformClassNames.put(LifeformType.CARNIVORE, "Carnivore");
     }
 
-    private final   TreeMap<Float, LifeformType> spawnRate;
-    private float   spawnIndex;
+    private final World                        world;
+    private final Random                       random;
+    private final List<LifeformType>           spawnQueue;
+    private final TreeMap<Float, Terrain>      terraformRate;
+    private final TreeMap<Float, LifeformType> spawnRate;
+    private       float                        terraformIndex;
+    private       float                        spawnIndex;
 
     /**
      * Constructs a Spawn.
+     * @param world    spawns new Lifeform into this World
      */
-    public Spawn() {
-        spawnRate  = new TreeMap<Float, LifeformType>();
-        spawnIndex = 0f;
+    public Spawn(final World world) {
+        this.world     = world;
+        random         = world.getRandom();
+        spawnQueue     = new ArrayList<LifeformType>();
+        terraformRate  = new TreeMap<Float, Terrain>();
+        spawnRate      = new TreeMap<Float, LifeformType>();
+        terraformIndex = 0f;
+        spawnIndex     = 0f;
+    }
+
+    /**
+     * Finalizes spawn rates.
+     */
+    public void init() {
+        addTerraformRate(null, 1.0f);
+        addSpawnRate(null, 1.0f);
+    }
+
+    /**
+     * Returns a Terrain based on selected probabilities.
+     */
+    public Terrain getTerrain() {
+        final float randomKey = terraformRate.lowerKey(random.nextFloat());
+        return terraformRate.get(randomKey);
     }
 
     /**
      * Creates a Lifeform based on selected probabilities at the specified Node.
-     * @param node    to spawn Lifeform in
-     * @return Lifeform
+     * @param node    to spawnAt Lifeform in
+     * @return Lifeform or null
      */
     public Lifeform spawnAt(final Node node) {
-        final float        rand = spawnRate.lowerKey(random.nextFloat());
-        final LifeformType lft = spawnRate.get(rand);
-        return spawn(lft, node);
+        final float        randomKey;
+        final LifeformType lft;
+
+        randomKey = spawnRate.lowerKey(random.nextFloat());
+        lft       = spawnRate.get(randomKey);
+        return spawnAt(node, lft);
     }
 
     /**
-     * Creates and returns a specified Lifeform.
-     * @param lft     LifeformType to create
-     * @param node    that Lifeform spawns in
-     * @return Lifeform
+     * Creates and returns a specified Lifeform or null.
+     * @param node     that Lifeform spawns in
+     * @param lft      LifeformType to create
+     * @return Lifeform or null
      */
-    public static Lifeform spawn(final LifeformType lft, final Node node) {
+    public Lifeform spawnAt(final Node node, final LifeformType lft) {
         final Constructor constructor;
 
+        if (lft == null) {
+            return null;
+        }
+
         try {
-            constructor = Class.forName(packageName + "." + classNames.get(lft))
-                    .getConstructor(Node.class);
-            return (Lifeform) constructor.newInstance(node);
+            constructor = Class.forName(lifeformPkgName + "." + lifeformClassNames.get(lft))
+                    .getConstructor(Node.class, World.class);
+            return (Lifeform) constructor.newInstance(node, world);
         } catch (final ClassNotFoundException ex) {
-            System.err.println("Cannot find class: " + classNames.get(lft));
+            System.err.println("Cannot find class: " + lifeformClassNames.get(lft));
             System.exit(1);
         } catch (final InstantiationException ex) {
-            System.err.println("Error creating: " + classNames.get(lft));
+            System.err.println("Error creating: " + lifeformClassNames.get(lft));
             System.exit(1);
         } catch (final IllegalAccessException ex) {
-            System.err.println(classNames.get(lft) + " must have a public constructor");
+            System.err.println(lifeformClassNames.get(lft) + " must have a public constructor");
             System.exit(1);
         } catch (final NoSuchMethodException ex) {
-            System.err.println("No such method in creating: " + classNames.get(lft));
+            System.err.println("No such method in creating: " + lifeformClassNames.get(lft));
             System.exit(1);
         } catch (final InvocationTargetException ex) {
             System.err.println("Error in creating constructor for class: "
-                    + classNames.get(lft));
+                    + lifeformClassNames.get(lft));
             System.exit(1);
         }
 
-        // Should be unreachable!
+        // should be unreachable!
         return null;
     }
 
     /**
-     * Add the specified spawn probability for the specified Lifeform.
+     * Add the specified terrain terraform probability for the specified Terrain.
+     * @param terrain        type
+     * @param probability    of a Node being the specified Terrain type
+     */
+    protected void addTerraformRate(final Terrain terrain, final float probability) {
+        terraformRate.put(terraformIndex, terrain);
+        terraformIndex += probability;
+    }
+
+    /**
+     * Add the specified spawnAt probability for the specified Lifeform.
      * @param lft            LifeformType
      * @param probability    of spawning
      */

@@ -2,52 +2,54 @@ package ca.bcit.comp2526.a2b.renderers;
 
 import ca.bcit.comp2526.a2b.World;
 import ca.bcit.comp2526.a2b.grids.Grid;
+import ca.bcit.comp2526.a2b.lifeforms.Lifeform;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+import java.awt.*;
 
 /**
  * Renderer.
  *
  * @author  Wei Zhou
- * @version 2016-11-08
+ * @version 2016-11-10
  * @since   2016-11-06
  */
 public abstract class Renderer extends JPanel {
 
-    private final JFrame     frame;
-    private final World      world;
-    private final Grid       grid;
+    private static final Toolkit TOOLKIT;
+
+    static {
+        TOOLKIT = Toolkit.getDefaultToolkit();
+    }
+
+    private final JFrame frame;
+    private final World  world;
 
     /**
      * Constructs a new Renderer.
      * @param frame    window to render GUI
      * @param world    to render
-     * @param grid     structure for World
      */
-    public Renderer(final JFrame frame, final World world, final Grid grid) {
+    public Renderer(final JFrame frame, final World world) {
         this.frame = frame;
         this.world = world;
-        this.grid  = grid;
     }
 
     /**
      * Adds this Renderer to the frame window.
      */
     public void init() {
-        setPreferredSize(grid.getSize());
+        setPreferredSize(world.getGrid().getSize());
         frame.add(this);
+        frame.setLocation(centerOnScreen(world.getGrid().getSize()));
     }
 
-    public World getWorld() {
-        return world;
-    }
-
-    public Grid getGrid() {
-        return grid;
+    /**
+     * Updates GUI.
+     */
+    public void update() {
+        repaint();
     }
 
     /**
@@ -57,21 +59,16 @@ public abstract class Renderer extends JPanel {
     public void paint(final Graphics graphics) {
         final Graphics2D g2 = (Graphics2D) graphics;
         setGraphicsOptions(g2);
-        drawGrid(g2);
-        drawLifeforms(g2);
+        drawWorld(g2, world.getGrid(), world.getLifeforms());
     }
 
     /**
-     * Draws Grid.
-     * @param g2    Graphics2D object to draw on
-     */
-    public abstract void drawGrid(Graphics2D g2);
-
-    /**
      * Draws Lifeforms.
-     * @param g2    Graphics2D object to draw on
+     * @param g2           Graphics2D object to draw on
+     * @param grid         structure
+     * @param lifeforms    to draw
      */
-    public abstract void drawLifeforms(Graphics2D g2);
+    public abstract void drawWorld(Graphics2D g2, Grid grid, Lifeform[] lifeforms);
 
     /*
      * Sets up anti-aliasing for drawing.
@@ -82,5 +79,20 @@ public abstract class Renderer extends JPanel {
                 RenderingHints.VALUE_ANTIALIAS_ON
         );
         g2.setRenderingHints(rh);
+    }
+
+    /**
+     * Returns the centre point of the screen.
+     * @param size    a Dimension
+     * @return a Point that refers to the centre point of the screen.
+     */
+    public static Point centerOnScreen(final Dimension size) {
+        final Dimension screenSize;
+        if (size == null) {
+            throw new IllegalArgumentException("Size cannot be null");
+        }
+        screenSize = TOOLKIT.getScreenSize();
+        return (new Point((screenSize.width - size.width) / 2,
+                (screenSize.height - size.height) / 2));
     }
 }

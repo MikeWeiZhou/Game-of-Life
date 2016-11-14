@@ -6,47 +6,52 @@ import ca.bcit.comp2526.a2b.grids.Node;
 import java.awt.Color;
 
 /**
- * Plant.
+ * Omnivore.
  *
  * @author  Wei Zhou
  * @version 2016-11-13
- * @since   2016-11-07
+ * @since   2016-11-13
  */
-public class Plant extends Lifeform {
+public class Omnivore extends Animal {
 
     private static final LifeformType TYPE;
     private static final Color        COLOR;
     private static final int          HEALTH;
     private static final int          VISION;
+    private static final Trait        TARGET;
+
     private static final int          R_NEIGHBORS;
     private static final int          R_EMPTY;
     private static final int          R_MAX_BABIES;
+    private static final int          R_FOOD;
 
     static {
-        TYPE   = LifeformType.PLANT;
-        COLOR  = Color.green;
-        HEALTH = 10;
+        TYPE   = LifeformType.OMNIVORE;
+        COLOR  = Color.magenta;
+        HEALTH = 4;
         VISION = 1;
+        TARGET = Trait.OMNIVORE_EDIBLE;
 
-        R_NEIGHBORS  = 3;
-        R_EMPTY      = 2;
-        R_MAX_BABIES = 2;
+        R_NEIGHBORS  = 1;
+        R_EMPTY      = 3;
+        R_MAX_BABIES = 1;
+        R_FOOD       = 3;
     }
 
     /**
-     * Constructs a new Plant.
-     * @param node    that contains this Plant
-     * @param world   that contains this Plant
+     * Constructs a new Omnivore.
+     * @param node   that contains this Omnivore
+     * @param world  that contains this Omnivore
      */
-    public Plant(final Node node, final World world) {
+    public Omnivore(final Node node, final World world) {
         super(TYPE, node, world);
         setDefaultColor(COLOR);
         setMaxHealth(HEALTH);
         setVisionLevel(VISION);
-        setSexConditions(R_NEIGHBORS, R_EMPTY, R_MAX_BABIES);
+        setSexConditions(R_NEIGHBORS, R_EMPTY, R_MAX_BABIES, R_FOOD);
+        setTargetTrait(TARGET);
 
         addTrait(Trait.CARNIVORE_EDIBLE);
-        addTrait(Trait.HERBIVORE_EDIBLE);
         addTrait(Trait.OMNIVORE_EDIBLE);
     }
 }

@@ -1,58 +1,32 @@
 package ca.bcit.comp2526.a2b;
 
-import ca.bcit.comp2526.a2b.grids.Grid;
-import ca.bcit.comp2526.a2b.grids.SquareGrid;
-import ca.bcit.comp2526.a2b.spawns.NaturalSpawn;
-import ca.bcit.comp2526.a2b.spawns.Spawn;
-import ca.bcit.comp2526.a2b.renderers.Renderer;
-import ca.bcit.comp2526.a2b.renderers.SquareRenderer;
-
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Toolkit;
 import javax.swing.JFrame;
 
 /**
  * Main.
  *
  * @author  Wei Zhou
- * @version 2016-11-08
+ * @version 2016-11-13
  * @since   2016-11-06
  */
 public final class Main extends JFrame {
 
-    private static final String  TITLE;
-    private static final Toolkit TOOLKIT;
-
-    static {
-        TITLE   = "Game of Life";
-        TOOLKIT = Toolkit.getDefaultToolkit();
-    }
+    private static final String TITLE= "Game of Life";
 
     /*
      * Constructs a new Main.
      */
     private Main() {
-        final Spawn spawn;
-        final Grid     grid;
-        final World    world;
-        final Renderer renderer;
-
-        spawn    = new NaturalSpawn();
-        grid     = new SquareGrid(5, 5, 100);
-        world    = new World(spawn, grid);
-        renderer = new SquareRenderer(this, world, grid);
-
-        grid.init();
+        final World world = new World(this);
         world.init();
-        renderer.init();
 
         setTitle(TITLE);
         pack();
 
-        setLocation(centerOnScreen(grid.getSize()));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
+
+        addMouseListener(new TurnListener(world));
     }
 
     /**
@@ -61,20 +35,5 @@ public final class Main extends JFrame {
      */
     public static void main(final String[] argv) {
         new Main();
-    }
-
-    /**
-     * Returns the centre point of the screen.
-     * @param size    a Dimension
-     * @return a Point that refers to the centre point of the screen.
-     */
-    public static Point centerOnScreen(final Dimension size) {
-        final Dimension screenSize;
-        if (size == null) {
-            throw new IllegalArgumentException("Size cannot be null");
-        }
-        screenSize = TOOLKIT.getScreenSize();
-        return (new Point((screenSize.width - size.width) / 2,
-                (screenSize.height - size.height) / 2));
     }
 }

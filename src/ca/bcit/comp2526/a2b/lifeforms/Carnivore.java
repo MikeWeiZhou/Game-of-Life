@@ -2,23 +2,25 @@ package ca.bcit.comp2526.a2b.lifeforms;
 
 import ca.bcit.comp2526.a2b.World;
 import ca.bcit.comp2526.a2b.grids.Node;
+import ca.bcit.comp2526.a2b.grids.Terrain;
 
 import java.awt.Color;
 
 /**
- * Herbivore.
+ * Carnivore.
  *
  * @author  Wei Zhou
  * @version 2016-11-13
- * @since   2016-11-08
+ * @since   2016-11-13
  */
-public class Herbivore extends Animal {
+public class Carnivore extends Animal {
 
     private static final LifeformType TYPE;
     private static final Color        COLOR;
     private static final int          HEALTH;
     private static final int          VISION;
     private static final Trait        TARGET;
+    private static final Terrain      INHABITABLE;
 
     private static final int          R_NEIGHBORS;
     private static final int          R_EMPTY;
@@ -26,30 +28,32 @@ public class Herbivore extends Animal {
     private static final int          R_FOOD;
 
     static {
-        TYPE   = LifeformType.HERBIVORE;
-        COLOR  = Color.yellow;
-        HEALTH = 6;
-        VISION = 1;
-        TARGET = Trait.HERBIVORE_EDIBLE;
+        TYPE        = LifeformType.CARNIVORE;
+        COLOR       = Color.red;
+        HEALTH      = 3;
+        VISION      = 2;
+        TARGET      = Trait.CARNIVORE_EDIBLE;
+        INHABITABLE = Terrain.WATER;
 
         R_NEIGHBORS  = 1;
-        R_EMPTY      = 2;
-        R_MAX_BABIES = 2;
-        R_FOOD       = 2;
+        R_EMPTY      = 3;
+        R_MAX_BABIES = 1;
+        R_FOOD       = 3;
     }
 
     /**
-     * Constructs a new Herbivore.
-     * @param node    that contains this Herbivore
-     * @param world  that contains this Herbivore
+     * Constructs a new Carnivore.
+     * @param node   that contains this Carnivore
+     * @param world  that contains this Carnivore
      */
-    public Herbivore(final Node node, final World world) {
+    public Carnivore(final Node node, final World world) {
         super(TYPE, node, world);
         setDefaultColor(COLOR);
         setMaxHealth(HEALTH);
         setVisionLevel(VISION);
         setSexConditions(R_NEIGHBORS, R_EMPTY, R_MAX_BABIES, R_FOOD);
         setTargetTrait(TARGET);
+        setInhabitable(INHABITABLE);
 
         addTrait(Trait.CARNIVORE_EDIBLE);
         addTrait(Trait.OMNIVORE_EDIBLE);
