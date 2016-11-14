@@ -22,7 +22,7 @@ public class BalancedSpawn extends Spawn {
 
         addSpawnRate(LifeformType.PLANT,     0.3f);
         addSpawnRate(LifeformType.HERBIVORE, 0.1f);
-        addSpawnRate(LifeformType.CARNIVORE, 0.04f);
+        addSpawnRate(LifeformType.CARNIVORE, 0.05f);
         addSpawnRate(LifeformType.OMNIVORE,  0.1f);
 
         addTerraformRate(Terrain.WATER, 0.03f);

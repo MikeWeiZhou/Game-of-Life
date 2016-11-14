@@ -127,7 +127,7 @@ public abstract class Lifeform {
     /**
      * Returns inhabitable Terrain for this Animal.
      */
-    protected Terrain getInhabitable() {
+    public Terrain getInhabitable() {
         return inhabitable;
     }
 
@@ -167,7 +167,7 @@ public abstract class Lifeform {
     /**
      * Returns the targeted Trait of this Lifeform.
      */
-    protected Trait getTargetTrait() {
+    public Trait getTargetTrait() {
         return targetTrait;
     }
 

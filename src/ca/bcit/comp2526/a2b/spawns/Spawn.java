@@ -92,6 +92,7 @@ public abstract class Spawn {
      */
     public Lifeform spawnAt(final Node node, final LifeformType lft) {
         final Constructor constructor;
+        final Lifeform    lf;
 
         if (lft == null) {
             return null;
@@ -100,7 +101,10 @@ public abstract class Spawn {
         try {
             constructor = Class.forName(lifeformPkgName + "." + lifeformClassNames.get(lft))
                     .getConstructor(Node.class, World.class);
-            return (Lifeform) constructor.newInstance(node, world);
+            lf = (Lifeform) constructor.newInstance(node, world);
+            if (!node.getTerrain().equals(lf.getInhabitable())) {
+                return lf;
+            }
         } catch (final ClassNotFoundException ex) {
             System.err.println("Cannot find class: " + lifeformClassNames.get(lft));
             System.exit(1);
@@ -119,7 +123,6 @@ public abstract class Spawn {
             System.exit(1);
         }
 
-        // should be unreachable!
         return null;
     }
 
