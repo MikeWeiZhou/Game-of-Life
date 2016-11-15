@@ -2,6 +2,7 @@ package ca.bcit.comp2526.a2b.lifeforms;
 
 import ca.bcit.comp2526.a2b.World;
 import ca.bcit.comp2526.a2b.grids.Node;
+import ca.bcit.comp2526.a2b.grids.Terrain;
 
 import java.awt.Color;
 
@@ -18,17 +19,17 @@ public class Plant extends Lifeform {
     private static final Color        COLOR;
     private static final int          HEALTH;
     private static final int          VISION;
-    private static final float        DEATH_RATIO;
     private static final int          R_NEIGHBORS;
     private static final int          R_EMPTY;
     private static final int          R_MAX_BABIES;
+    private static final Terrain      INHABITABLE;
 
     static {
         TYPE        = LifeformType.PLANT;
         COLOR       = Color.green;
         HEALTH      = 10;
         VISION      = 1;
-        DEATH_RATIO = 0;
+        INHABITABLE = Terrain.WATER;
 
         R_NEIGHBORS  = 3;
         R_EMPTY      = 2;
@@ -46,9 +47,8 @@ public class Plant extends Lifeform {
         setMaxHealth(HEALTH);
         setVisionLevel(VISION);
         setSexConditions(R_NEIGHBORS, R_EMPTY, R_MAX_BABIES);
-        setNaturalDeathRatio(DEATH_RATIO);
+        setInhabitable(INHABITABLE);
 
-        addTrait(Trait.CARNIVORE_EDIBLE);
         addTrait(Trait.HERBIVORE_EDIBLE);
         addTrait(Trait.OMNIVORE_EDIBLE);
     }

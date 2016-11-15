@@ -22,7 +22,7 @@ public class TurnListener extends MouseAdapter{
     static {
         TIME_UNIT  = TimeUnit.MILLISECONDS;
         INIT_DELAY = 0;
-        PERIOD     = 150;
+        PERIOD     = 100;
     }
 
     private final World   world;

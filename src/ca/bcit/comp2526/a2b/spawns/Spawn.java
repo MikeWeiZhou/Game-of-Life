@@ -19,11 +19,14 @@ import java.util.*;
  */
 public abstract class Spawn {
 
+    public static final LifeformType LIFELESS_TYPE;
+
     private static final String PACKAGE_NAME;
     private static final Map<LifeformType, String> CLASS_NAMES;
 
     static {
-        PACKAGE_NAME = "ca.bcit.comp2526.a2b.lifeforms";
+        LIFELESS_TYPE = LifeformType.LIFELESS;
+        PACKAGE_NAME  = "ca.bcit.comp2526.a2b.lifeforms";
 
         CLASS_NAMES = new HashMap<LifeformType, String>();
         CLASS_NAMES.put(LifeformType.PLANT,     "Plant");
@@ -36,6 +39,7 @@ public abstract class Spawn {
     private final Random                       random;
     private final TreeMap<Float, Terrain>      terraformRate;
     private final TreeMap<Float, LifeformType> spawnRate;
+    private final Map<LifeformType, Float>     mortalityRates;
     private       float                        terraformIndex;
     private       float                        spawnIndex;
 
@@ -48,16 +52,51 @@ public abstract class Spawn {
         random         = world.getRandom();
         terraformRate  = new TreeMap<Float, Terrain>();
         spawnRate      = new TreeMap<Float, LifeformType>();
+        mortalityRates = new HashMap<LifeformType, Float>();
         terraformIndex = 0f;
         spawnIndex     = 0f;
     }
 
     /**
-     * Finalizes spawn rates.
+     * Throws an error if Spawn in an illegal state.
+     * Then finalizes spawn and terraform rates.
      */
     public void init() {
+        if (spawnRate.size() != mortalityRates.size()) {
+            throw new IllegalStateException();
+        }
+
         addTerraformRate(null, 1.0f);
         addSpawnRate(null, 1.0f);
+    }
+
+    /**
+     * Add the specified terrain terraform probability for the specified Terrain.
+     * @param terrain        type
+     * @param probability    of a Node being the specified Terrain type
+     */
+    protected void addTerraformRate(final Terrain terrain, final float probability) {
+        terraformRate.put(terraformIndex, terrain);
+        terraformIndex += probability;
+    }
+
+    /**
+     * Add the specified spawnAt probability for the specified Lifeform.
+     * @param lft            LifeformType
+     * @param probability    of spawning
+     */
+    protected void addSpawnRate(final LifeformType lft, final float probability) {
+        spawnRate.put(spawnIndex, lft);
+        spawnIndex += probability;
+    }
+
+    /**
+     * Adds mortalityRate to specified LifeformType.
+     * @param lft     LifeformType
+     * @param rate    mortality rate
+     */
+    protected void addMortalityRate(final LifeformType lft, final float rate) {
+        mortalityRates.put(lft, rate);
     }
 
     /**
@@ -102,6 +141,8 @@ public abstract class Spawn {
             lf = (Lifeform) constructor.newInstance(node, world);
 
             if (!node.getTerrain().equals(lf.getInhabitable())) {
+                lf.setMortalityRate(mortalityRates.get(lft));
+                lf.init();
                 return lf;
             }
         } catch (final ClassNotFoundException ex) {
@@ -123,25 +164,5 @@ public abstract class Spawn {
         }
 
         return null;
-    }
-
-    /**
-     * Add the specified terrain terraform probability for the specified Terrain.
-     * @param terrain        type
-     * @param probability    of a Node being the specified Terrain type
-     */
-    protected void addTerraformRate(final Terrain terrain, final float probability) {
-        terraformRate.put(terraformIndex, terrain);
-        terraformIndex += probability;
-    }
-
-    /**
-     * Add the specified spawnAt probability for the specified Lifeform.
-     * @param lft            LifeformType
-     * @param probability    of spawning
-     */
-    protected void addSpawnRate(final LifeformType lft, final float probability) {
-        spawnRate.put(spawnIndex, lft);
-        spawnIndex += probability;
     }
 }

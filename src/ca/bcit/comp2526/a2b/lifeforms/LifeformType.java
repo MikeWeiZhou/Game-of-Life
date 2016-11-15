@@ -9,6 +9,9 @@ package ca.bcit.comp2526.a2b.lifeforms;
  */
 public enum LifeformType {
 
+    /** Lifeless; does nothing. */
+    LIFELESS,
+
     /** Animal: Herbivores. */
     HERBIVORE,
 

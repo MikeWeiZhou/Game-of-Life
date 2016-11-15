@@ -30,6 +30,10 @@ public abstract class Animal extends Lifeform {
      */
     @Override
     public void init() {
+        if (getVisionLevel() == 0 || getTargetTrait() == null) {
+            throw new IllegalStateException();
+        }
+
         super.init();
     }
 

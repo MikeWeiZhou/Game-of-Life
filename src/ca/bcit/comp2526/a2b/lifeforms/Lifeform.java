@@ -20,6 +20,7 @@ import java.util.Set;
  */
 public abstract class Lifeform {
 
+    // mandatory settings to set
     private final World        world;
     private final Set<Trait>   traits;
     private final LifeformType type;
@@ -29,15 +30,18 @@ public abstract class Lifeform {
     private       Color        defaultColor;
     private       int          health;
     private       int          maxHealth;
+    private       float        mortalityRate;
+
+    // mandatory: reproduction settings
+    private       int          repNeighborsAlike;
+    private       int          repNeighborsEmpty;
+    private       int          repMaxBabies;
+    private       int          repNeighborsFood; // optional
+
+    // optional settings to set
     private       int          visionLevel;
     private       Trait        targetTrait;
     private       Terrain      inhabitable;
-    private       float        naturalDeathRatio;
-
-    private       int          repNeighborsAlike;
-    private       int          repNeighborsEmpty;
-    private       int          repNeighborsFood;
-    private       int          repMaxBabies;
 
     /**
      * Constructs a new Lifeform.
@@ -57,11 +61,19 @@ public abstract class Lifeform {
      * Throws an error if Lifeform is in an illegal state.
      */
     public void init() {
-        if (color == null || health == 0 || repNeighborsAlike == 0 ||
-                repNeighborsEmpty == 0 || repMaxBabies == 0 ||
-                naturalDeathRatio == 0) {
+        if (getDefaultColor() == null || getMaxHealth() == 0 || getMortalityRate() == 0 ||
+                repNeighborsAlike == 0 || repNeighborsEmpty == 0 || repMaxBabies == 0) {
+
             throw new IllegalStateException();
         }
+    }
+
+    /**
+     * Sets the mortality rate for this Lifeform.
+     * @param rate    mortality rate
+     */
+    public void setMortalityRate(final float rate) {
+        mortalityRate = rate;
     }
 
     /**
@@ -92,9 +104,12 @@ public abstract class Lifeform {
             }
         }
 
-        if (partnersNearby >= repNeighborsAlike && emptyNearby >= repNeighborsEmpty
+        if (partnersNearby >= repNeighborsAlike
+                && emptyNearby >= repNeighborsEmpty
                 && foodNearby >= repNeighborsFood) {
-            return makeBabies(emptyNodes.iterator(), repMaxBabies);
+
+            final int numOfBabies = getWorld().getRandom().nextInt(repMaxBabies) + 1;
+            return makeBabies(emptyNodes.iterator(), numOfBabies);
         }
 
         // return an array of size 0; no newborns
@@ -109,10 +124,9 @@ public abstract class Lifeform {
             setHealth(getHealth() - 1);
         }
 
-        if (health <= 0) {
+        if (health <= 0 || naturalDeath()) {
             kill();
         } else {
-            naturalDeath();
             setColor(calcColor(defaultColor, health, maxHealth));
         }
     }
@@ -184,8 +198,8 @@ public abstract class Lifeform {
      * Returns the natural death ratio of this Lifeform.
      * @return natural death ratio
      */
-    public float getNaturalDeathRatio() {
-        return naturalDeathRatio;
+    public float getMortalityRate() {
+        return mortalityRate;
     }
 
     /**
@@ -333,23 +347,13 @@ public abstract class Lifeform {
     }
 
     /**
-     * Sets the natural death ratio for this Lifeform.
-     * @param ratio    natural death ratio
+     * Returns true if this Lifeform should die of naturalDeath.
+     * @return true if Lifeform should die
      */
-    protected void setNaturalDeathRatio(final float ratio) {
-        naturalDeathRatio = ratio;
+    protected boolean naturalDeath() {
+        final float rand = getWorld().getRandom().nextFloat();
+        return 0 <= rand && rand <= getMortalityRate();
     }
-
-    /**
-     * Randomly kills this Lifeform based on naturalDeathRatio.
-     */
-    protected void naturalDeath() {
-        float rand = getWorld().getRandom().nextFloat();
-        if (rand <= getNaturalDeathRatio()) {
-            kill();
-        }
-    }
-
 
     /**
      * Calculates and returns the right Color shade for a Lifeform given current and maximum health.

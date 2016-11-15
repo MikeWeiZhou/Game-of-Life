@@ -8,6 +8,12 @@ import java.awt.Color;
 /**
  * Omnivore.
  *
+ * <p>
+ *     A well balanced World with only Omnivores and Plants. Omnivores with
+ *     5.5% mortality paired with Plants that have a 1% death rate seem to
+ *     be a match made in heaven.
+ * </p>
+ *
  * @author  Wei Zhou
  * @version 2016-11-13
  * @since   2016-11-13
@@ -19,7 +25,6 @@ public class Omnivore extends Animal {
     private static final int          HEALTH;
     private static final int          VISION;
     private static final Trait        TARGET;
-    private static final float        DEATH_RATIO;
 
     private static final int          R_NEIGHBORS;
     private static final int          R_EMPTY;
@@ -32,7 +37,6 @@ public class Omnivore extends Animal {
         HEALTH      = 4;
         VISION      = 1;
         TARGET      = Trait.OMNIVORE_EDIBLE;
-        DEATH_RATIO = 0.1f;
 
         R_NEIGHBORS  = 1;
         R_EMPTY      = 3;
@@ -52,9 +56,7 @@ public class Omnivore extends Animal {
         setVisionLevel(VISION);
         setSexConditions(R_NEIGHBORS, R_EMPTY, R_MAX_BABIES, R_FOOD);
         setTargetTrait(TARGET);
-        setNaturalDeathRatio(DEATH_RATIO);
 
         addTrait(Trait.CARNIVORE_EDIBLE);
-        addTrait(Trait.OMNIVORE_EDIBLE);
     }
 }

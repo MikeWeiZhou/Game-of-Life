@@ -21,7 +21,6 @@ public class Carnivore extends Animal {
     private static final int          VISION;
     private static final Trait        TARGET;
     private static final Terrain      INHABITABLE;
-    private static final float        DEATH_RATIO;
 
     private static final int          R_NEIGHBORS;
     private static final int          R_EMPTY;
@@ -35,7 +34,6 @@ public class Carnivore extends Animal {
         VISION      = 2;
         TARGET      = Trait.CARNIVORE_EDIBLE;
         INHABITABLE = Terrain.WATER;
-        DEATH_RATIO = 0.1f;
 
         R_NEIGHBORS  = 1;
         R_EMPTY      = 3;
@@ -56,9 +54,7 @@ public class Carnivore extends Animal {
         setSexConditions(R_NEIGHBORS, R_EMPTY, R_MAX_BABIES, R_FOOD);
         setTargetTrait(TARGET);
         setInhabitable(INHABITABLE);
-        setNaturalDeathRatio(DEATH_RATIO);
 
-        addTrait(Trait.CARNIVORE_EDIBLE);
         addTrait(Trait.OMNIVORE_EDIBLE);
     }
 }

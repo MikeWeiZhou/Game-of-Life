@@ -2,9 +2,11 @@ package ca.bcit.comp2526.a2b;
 
 import ca.bcit.comp2526.a2b.grids.*;
 import ca.bcit.comp2526.a2b.lifeforms.Lifeform;
+import ca.bcit.comp2526.a2b.lifeforms.LifeformType;
 import ca.bcit.comp2526.a2b.renderers.Renderer;
 import ca.bcit.comp2526.a2b.renderers.SquareRenderer;
-import ca.bcit.comp2526.a2b.spawns.BalancedSpawn;
+import ca.bcit.comp2526.a2b.spawns.AncientPhytophagous;
+import ca.bcit.comp2526.a2b.spawns.NaturalSpawn;
 import ca.bcit.comp2526.a2b.spawns.Spawn;
 
 import javax.swing.JFrame;
@@ -31,8 +33,8 @@ public class World {
     public World(final JFrame frame) {
         random    = new Random();
         lifeforms = new ArrayList<Lifeform>();
-        grid      = new SquareGrid(60, 50, 15);
-        spawn     = new BalancedSpawn(this);
+        grid      = new SquareGrid(60, 40, 15);
+        spawn     = new NaturalSpawn(this);
         renderer  = new SquareRenderer(frame, this);
     }
 
@@ -74,6 +76,11 @@ public class World {
         removeDeadLifeforms();
         Collections.shuffle(lifeforms);
         renderer.update();
+
+        // restart game if no more lifeforms
+        if (lifeforms.size() == 0) {
+            createWorld();
+        }
     }
 
     /**
