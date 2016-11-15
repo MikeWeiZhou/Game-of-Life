@@ -15,12 +15,10 @@ import java.util.Set;
  * Lifeform.
  *
  * @author  Wei Zhou
- * @version 2016-11-13
+ * @version 2016-11-14
  * @since   2016-11-06
  */
 public abstract class Lifeform {
-
-    private final int MAX_COLOR_INTENSITY = 255;
 
     private final World        world;
     private final Set<Trait>   traits;
@@ -34,6 +32,7 @@ public abstract class Lifeform {
     private       int          visionLevel;
     private       Trait        targetTrait;
     private       Terrain      inhabitable;
+    private       float        naturalDeathRatio;
 
     private       int          repNeighborsAlike;
     private       int          repNeighborsEmpty;
@@ -59,7 +58,8 @@ public abstract class Lifeform {
      */
     public void init() {
         if (color == null || health == 0 || repNeighborsAlike == 0 ||
-                  repNeighborsEmpty == 0 || repMaxBabies == 0) {
+                repNeighborsEmpty == 0 || repMaxBabies == 0 ||
+                naturalDeathRatio == 0) {
             throw new IllegalStateException();
         }
     }
@@ -112,7 +112,8 @@ public abstract class Lifeform {
         if (health <= 0) {
             kill();
         } else {
-            darkenColor();
+            naturalDeath();
+            setColor(calcColor(defaultColor, health, maxHealth));
         }
     }
 
@@ -177,6 +178,14 @@ public abstract class Lifeform {
      */
     public Color getColor() {
         return color;
+    }
+
+    /**
+     * Returns the natural death ratio of this Lifeform.
+     * @return natural death ratio
+     */
+    public float getNaturalDeathRatio() {
+        return naturalDeathRatio;
     }
 
     /**
@@ -323,21 +332,47 @@ public abstract class Lifeform {
         alive = false;
     }
 
-    /*
-     * Darkens Lifeform's color.
+    /**
+     * Sets the natural death ratio for this Lifeform.
+     * @param ratio    natural death ratio
      */
-    private void darkenColor() {
-        final float fraction = Math.min(1, (float) getHealth() / getMaxHealth());
-        final int r = (int) Math.round(Math.max(0, getDefaultColor().getRed() * fraction));
-        final int g = (int) Math.round(Math.max(0, getDefaultColor().getGreen() * fraction));
-        final int b = (int) Math.round(Math.max(0, getDefaultColor().getBlue() * fraction));
-        setColor(new Color(r, g, b, getDefaultColor().getAlpha()));
+    protected void setNaturalDeathRatio(final float ratio) {
+        naturalDeathRatio = ratio;
     }
 
-    /*
-     * Makes babies at random empty Nodes
+    /**
+     * Randomly kills this Lifeform based on naturalDeathRatio.
      */
-    private Lifeform[] makeBabies(final Iterator<Node> empty, int maxBabies) {
+    protected void naturalDeath() {
+        float rand = getWorld().getRandom().nextFloat();
+        if (rand <= getNaturalDeathRatio()) {
+            kill();
+        }
+    }
+
+
+    /**
+     * Calculates and returns the right Color shade for a Lifeform given current and maximum health.
+     * @param baseColor        to calculate shade for
+     * @param currentHealth    of Lifeform
+     * @param maxHealth        of Lifeform
+     * @return a different shade of baseColor
+     */
+    protected Color calcColor(final Color baseColor, final int currentHealth, final int maxHealth) {
+        final float fraction = Math.min(1, (float) getHealth() / getMaxHealth());
+        final int r = (int) Math.round(Math.max(0, baseColor.getRed() * fraction));
+        final int g = (int) Math.round(Math.max(0, baseColor.getGreen() * fraction));
+        final int b = (int) Math.round(Math.max(0, baseColor.getBlue() * fraction));
+        return new Color(r, g, b, baseColor.getAlpha());
+    }
+
+    /**
+     * Creates and returns an array of newborns for this Lifeform.
+     * @param empty        Iterator for empty Nodes where babies can live in
+     * @param maxBabies    to produce of this LifeformType
+     * @return array of newborn Lifeforms
+     */
+    protected Lifeform[] makeBabies(final Iterator<Node> empty, int maxBabies) {
         final List<Lifeform> newborns = new ArrayList<Lifeform>();
 
         while (empty.hasNext() && maxBabies > 0) {

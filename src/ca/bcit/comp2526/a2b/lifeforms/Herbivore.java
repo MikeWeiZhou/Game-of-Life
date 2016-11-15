@@ -19,6 +19,7 @@ public class Herbivore extends Animal {
     private static final int          HEALTH;
     private static final int          VISION;
     private static final Trait        TARGET;
+    private static final float        DEATH_RATIO;
 
     private static final int          R_NEIGHBORS;
     private static final int          R_EMPTY;
@@ -26,11 +27,12 @@ public class Herbivore extends Animal {
     private static final int          R_FOOD;
 
     static {
-        TYPE   = LifeformType.HERBIVORE;
-        COLOR  = Color.yellow;
-        HEALTH = 6;
-        VISION = 1;
-        TARGET = Trait.HERBIVORE_EDIBLE;
+        TYPE        = LifeformType.HERBIVORE;
+        COLOR       = Color.yellow;
+        HEALTH      = 6;
+        VISION      = 1;
+        TARGET      = Trait.HERBIVORE_EDIBLE;
+        DEATH_RATIO = 0.1f;
 
         R_NEIGHBORS  = 1;
         R_EMPTY      = 2;
@@ -50,6 +52,7 @@ public class Herbivore extends Animal {
         setVisionLevel(VISION);
         setSexConditions(R_NEIGHBORS, R_EMPTY, R_MAX_BABIES, R_FOOD);
         setTargetTrait(TARGET);
+        setNaturalDeathRatio(DEATH_RATIO);
 
         addTrait(Trait.CARNIVORE_EDIBLE);
         addTrait(Trait.OMNIVORE_EDIBLE);

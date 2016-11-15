@@ -19,6 +19,7 @@ public class Omnivore extends Animal {
     private static final int          HEALTH;
     private static final int          VISION;
     private static final Trait        TARGET;
+    private static final float        DEATH_RATIO;
 
     private static final int          R_NEIGHBORS;
     private static final int          R_EMPTY;
@@ -26,11 +27,12 @@ public class Omnivore extends Animal {
     private static final int          R_FOOD;
 
     static {
-        TYPE   = LifeformType.OMNIVORE;
-        COLOR  = Color.magenta;
-        HEALTH = 4;
-        VISION = 1;
-        TARGET = Trait.OMNIVORE_EDIBLE;
+        TYPE        = LifeformType.OMNIVORE;
+        COLOR       = Color.magenta;
+        HEALTH      = 4;
+        VISION      = 1;
+        TARGET      = Trait.OMNIVORE_EDIBLE;
+        DEATH_RATIO = 0.1f;
 
         R_NEIGHBORS  = 1;
         R_EMPTY      = 3;
@@ -50,6 +52,7 @@ public class Omnivore extends Animal {
         setVisionLevel(VISION);
         setSexConditions(R_NEIGHBORS, R_EMPTY, R_MAX_BABIES, R_FOOD);
         setTargetTrait(TARGET);
+        setNaturalDeathRatio(DEATH_RATIO);
 
         addTrait(Trait.CARNIVORE_EDIBLE);
         addTrait(Trait.OMNIVORE_EDIBLE);

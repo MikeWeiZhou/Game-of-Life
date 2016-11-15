@@ -3,10 +3,13 @@ package ca.bcit.comp2526.a2b.renderers;
 import ca.bcit.comp2526.a2b.World;
 import ca.bcit.comp2526.a2b.grids.Grid;
 import ca.bcit.comp2526.a2b.lifeforms.Lifeform;
+import ca.bcit.comp2526.a2b.lifeforms.LifeformType;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Renderer.
@@ -23,11 +26,16 @@ public abstract class Renderer extends JPanel {
         TOOLKIT = Toolkit.getDefaultToolkit();
     }
 
+//    public static Renderer create(final RendererType rt, final JFrame frame,
+//                                                         final World  world) {
+//
+//    }
+
     private final JFrame frame;
     private final World  world;
 
     /**
-     * Constructs a new Renderer.
+     * Constructor.
      * @param frame    window to render GUI
      * @param world    to render
      */
@@ -70,6 +78,21 @@ public abstract class Renderer extends JPanel {
      */
     public abstract void drawWorld(Graphics2D g2, Grid grid, Lifeform[] lifeforms);
 
+    /**
+     * Returns the centre point of the screen.
+     * @param size    a Dimension
+     * @return a Point that refers to the centre point of the screen.
+     */
+    public Point centerOnScreen(final Dimension size) {
+        final Dimension screenSize;
+        if (size == null) {
+            throw new IllegalArgumentException("Size cannot be null");
+        }
+        screenSize = TOOLKIT.getScreenSize();
+        return (new Point((screenSize.width - size.width) / 2,
+                (screenSize.height - size.height) / 2));
+    }
+
     /*
      * Sets up anti-aliasing for drawing.
      */
@@ -79,20 +102,5 @@ public abstract class Renderer extends JPanel {
                 RenderingHints.VALUE_ANTIALIAS_ON
         );
         g2.setRenderingHints(rh);
-    }
-
-    /**
-     * Returns the centre point of the screen.
-     * @param size    a Dimension
-     * @return a Point that refers to the centre point of the screen.
-     */
-    public static Point centerOnScreen(final Dimension size) {
-        final Dimension screenSize;
-        if (size == null) {
-            throw new IllegalArgumentException("Size cannot be null");
-        }
-        screenSize = TOOLKIT.getScreenSize();
-        return (new Point((screenSize.width - size.width) / 2,
-                (screenSize.height - size.height) / 2));
     }
 }

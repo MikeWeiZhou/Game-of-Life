@@ -19,22 +19,21 @@ import java.util.*;
  */
 public abstract class Spawn {
 
-    private static final String lifeformPkgName;
-    private static final Map<LifeformType, String> lifeformClassNames;
+    private static final String PACKAGE_NAME;
+    private static final Map<LifeformType, String> CLASS_NAMES;
 
     static {
-        lifeformPkgName  = "ca.bcit.comp2526.a2b.lifeforms";
+        PACKAGE_NAME = "ca.bcit.comp2526.a2b.lifeforms";
 
-        lifeformClassNames = new HashMap<LifeformType, String>();
-        lifeformClassNames.put(LifeformType.PLANT,     "Plant");
-        lifeformClassNames.put(LifeformType.HERBIVORE, "Herbivore");
-        lifeformClassNames.put(LifeformType.OMNIVORE,  "Omnivore");
-        lifeformClassNames.put(LifeformType.CARNIVORE, "Carnivore");
+        CLASS_NAMES = new HashMap<LifeformType, String>();
+        CLASS_NAMES.put(LifeformType.PLANT,     "Plant");
+        CLASS_NAMES.put(LifeformType.HERBIVORE, "Herbivore");
+        CLASS_NAMES.put(LifeformType.OMNIVORE,  "Omnivore");
+        CLASS_NAMES.put(LifeformType.CARNIVORE, "Carnivore");
     }
 
     private final World                        world;
     private final Random                       random;
-    private final List<LifeformType>           spawnQueue;
     private final TreeMap<Float, Terrain>      terraformRate;
     private final TreeMap<Float, LifeformType> spawnRate;
     private       float                        terraformIndex;
@@ -47,7 +46,6 @@ public abstract class Spawn {
     public Spawn(final World world) {
         this.world     = world;
         random         = world.getRandom();
-        spawnQueue     = new ArrayList<LifeformType>();
         terraformRate  = new TreeMap<Float, Terrain>();
         spawnRate      = new TreeMap<Float, LifeformType>();
         terraformIndex = 0f;
@@ -99,27 +97,28 @@ public abstract class Spawn {
         }
 
         try {
-            constructor = Class.forName(lifeformPkgName + "." + lifeformClassNames.get(lft))
+            constructor = Class.forName(PACKAGE_NAME + "." + CLASS_NAMES.get(lft))
                     .getConstructor(Node.class, World.class);
             lf = (Lifeform) constructor.newInstance(node, world);
+
             if (!node.getTerrain().equals(lf.getInhabitable())) {
                 return lf;
             }
         } catch (final ClassNotFoundException ex) {
-            System.err.println("Cannot find class: " + lifeformClassNames.get(lft));
+            System.err.println("Cannot find class: " + CLASS_NAMES.get(lft));
             System.exit(1);
         } catch (final InstantiationException ex) {
-            System.err.println("Error creating: " + lifeformClassNames.get(lft));
+            System.err.println("Error creating: " + CLASS_NAMES.get(lft));
             System.exit(1);
         } catch (final IllegalAccessException ex) {
-            System.err.println(lifeformClassNames.get(lft) + " must have a public constructor");
+            System.err.println(CLASS_NAMES.get(lft) + " must have a public constructor");
             System.exit(1);
         } catch (final NoSuchMethodException ex) {
-            System.err.println("No such method in creating: " + lifeformClassNames.get(lft));
+            System.err.println("No such method in creating: " + CLASS_NAMES.get(lft));
             System.exit(1);
         } catch (final InvocationTargetException ex) {
             System.err.println("Error in creating constructor for class: "
-                    + lifeformClassNames.get(lft));
+                    + CLASS_NAMES.get(lft));
             System.exit(1);
         }
 

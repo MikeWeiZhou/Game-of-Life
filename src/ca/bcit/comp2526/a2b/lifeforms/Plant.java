@@ -18,15 +18,17 @@ public class Plant extends Lifeform {
     private static final Color        COLOR;
     private static final int          HEALTH;
     private static final int          VISION;
+    private static final float        DEATH_RATIO;
     private static final int          R_NEIGHBORS;
     private static final int          R_EMPTY;
     private static final int          R_MAX_BABIES;
 
     static {
-        TYPE   = LifeformType.PLANT;
-        COLOR  = Color.green;
-        HEALTH = 10;
-        VISION = 1;
+        TYPE        = LifeformType.PLANT;
+        COLOR       = Color.green;
+        HEALTH      = 10;
+        VISION      = 1;
+        DEATH_RATIO = 0;
 
         R_NEIGHBORS  = 3;
         R_EMPTY      = 2;
@@ -44,6 +46,7 @@ public class Plant extends Lifeform {
         setMaxHealth(HEALTH);
         setVisionLevel(VISION);
         setSexConditions(R_NEIGHBORS, R_EMPTY, R_MAX_BABIES);
+        setNaturalDeathRatio(DEATH_RATIO);
 
         addTrait(Trait.CARNIVORE_EDIBLE);
         addTrait(Trait.HERBIVORE_EDIBLE);

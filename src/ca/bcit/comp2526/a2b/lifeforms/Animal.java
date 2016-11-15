@@ -8,12 +8,12 @@ import ca.bcit.comp2526.a2b.grids.Terrain;
  * Animal.
  *
  * @author  Wei Zhou
- * @version 2016-11-11
+ * @version 2016-11-14
  * @since   2016-11-08
  */
 public abstract class Animal extends Lifeform {
 
-    private Node target;
+    private Node targetNode;
 
     /**
      * Constructs a new Animal.
@@ -38,20 +38,21 @@ public abstract class Animal extends Lifeform {
      */
     @Override
     public void takeAction() {
-        findTarget();
-        eat();
-        move();
+        targetNode = findTarget();
+        eat(targetNode);
+        moveTo(targetNode);
 
-        target = null;
+        targetNode = null;
         super.takeAction();
     }
 
-    /*
-     * Find edible target Node, or Node that is in the same direction.
-     * If no available target, sets target = null
+    /**
+     * Finds suitable target Node to eat and/or moveTo.
      */
-    private void findTarget() {
+    protected Node findTarget() {
         final Node[] targets = getNode().getNeighborsForLevel(getVisionLevel());
+              Node   target  = null;
+
         for (Node n : targets) {
             if (n.getTerrain() == getInhabitable()) {
                 continue;
@@ -69,26 +70,30 @@ public abstract class Animal extends Lifeform {
                 break;
             }
         }
+
+        return target;
     }
 
-    /*
-     * Eat Lifeform at target Node, if exists and edible.
+    /**
+     * Eats Lifeform at target Node, if edible.
+     * @param target    Node
      */
-    private void eat() {
+    protected void eat(final Node target) {
         final Lifeform targetLF = getWorld().getLifeformAt(target);
         if (targetLF != null && targetLF.isAlive() && targetLF.hasTrait(getTargetTrait())) {
             targetLF.kill();
 
-            // +1 due to eat first then move in logic
-            // suppose to move in first, then eat
+            // +1 due to eat first then moveTo in logic
+            // suppose to moveTo in first, then eat
             setHealth(getMaxHealth() + 1);
         }
     }
 
-    /*
-     * Move to target Node
+    /**
+     * Move to target Node if not null.
+     * @param target    Node
      */
-    private void move() {
+    protected void moveTo(final Node target) {
         if (target != null) {
             setNode(target);
         }

@@ -1,10 +1,7 @@
 package ca.bcit.comp2526.a2b;
 
-import ca.bcit.comp2526.a2b.grids.Node;
-import ca.bcit.comp2526.a2b.grids.SquareGrid;
-import ca.bcit.comp2526.a2b.grids.Terrain;
+import ca.bcit.comp2526.a2b.grids.*;
 import ca.bcit.comp2526.a2b.lifeforms.Lifeform;
-import ca.bcit.comp2526.a2b.grids.Grid;
 import ca.bcit.comp2526.a2b.renderers.Renderer;
 import ca.bcit.comp2526.a2b.renderers.SquareRenderer;
 import ca.bcit.comp2526.a2b.spawns.BalancedSpawn;
@@ -22,11 +19,11 @@ import java.util.*;
  */
 public class World {
 
-    private Random random;
-    private List<Lifeform> lifeforms;
-    private Grid           grid;
-    private Spawn          spawn;
-    private Renderer       renderer;
+    private final Random         random;
+    private final List<Lifeform> lifeforms;
+    private       Grid           grid;
+    private       Spawn          spawn;
+    private       Renderer       renderer;
 
     /**
      * Constructor.
@@ -34,7 +31,7 @@ public class World {
     public World(final JFrame frame) {
         random    = new Random();
         lifeforms = new ArrayList<Lifeform>();
-        grid      = new SquareGrid(50, 50, 15);
+        grid      = new SquareGrid(60, 50, 15);
         spawn     = new BalancedSpawn(this);
         renderer  = new SquareRenderer(frame, this);
     }
@@ -59,28 +56,22 @@ public class World {
      */
     public void takeTurn() {
 
-        // all alive Lifeforms reproduce & take action
+        // all alive Lifeforms take action
         ListIterator<Lifeform> it = lifeforms.listIterator();
         while (it.hasNext()) {
             Lifeform lf = it.next();
-            if (lf.isAlive()) {
-                lf.takeAction();
-                Lifeform[] newborns = lf.reproduce();
-                for (int i = 0; i < newborns.length; i++) {
-                    it.add(newborns[i]);
-                }
-            }
-        }
-
-        // remove dead Lifeforms
-        Iterator<Lifeform> it2 = lifeforms.iterator();
-        while (it2.hasNext()) {
-            Lifeform lf = it2.next();
             if (!lf.isAlive()) {
-                it2.remove();
+                continue;
+            }
+
+            lf.takeAction();
+            Lifeform[] newborns = lf.reproduce();
+            for (int i = 0; i < newborns.length; i++) {
+                it.add(newborns[i]);
             }
         }
 
+        removeDeadLifeforms();
         Collections.shuffle(lifeforms);
         renderer.update();
     }
@@ -131,21 +122,6 @@ public class World {
         return null;
     }
 
-//    /**
-//     * Returns the Lifeform at the specified row and column.
-//     * @param row    to check
-//     * @param col    to check
-//     * @return Lifeform or null
-//     */
-//    public Lifeform getLifeformAt(final int row, final int col) {
-//        for (Lifeform lf : lifeforms) {
-//            if (lf.getNode().getRow() == row && lf.getNode().getCol() == col) {
-//                return lf;
-//            }
-//        }
-//        return null;
-//    }
-
     /*
      * Populates the World with Terrain and Lifeforms.
      */
@@ -160,18 +136,23 @@ public class World {
                 t = spawn.getTerrain();
                 n.setTerrain(t);
 
-//                if (row == 0 && col == 0) {
-//                    lf = spawn.spawnAt(n, LifeformType.HERBIVORE);
-//                } else if (row == 1 && col == 2) {
-//                    lf = spawn.spawnAt(n, LifeformType.PLANT);
-//                } else {
-//                    lf = spawn.spawnAt(n, null);
-//                }
-
                 lf = spawn.spawnAt(n);
                 if (lf != null) {
                     lifeforms.add(lf);
                 }
+            }
+        }
+    }
+
+    /*
+     * Removes all dead Lifeforms.
+     */
+    private void removeDeadLifeforms() {
+        Iterator<Lifeform> it = lifeforms.iterator();
+        while (it.hasNext()) {
+            Lifeform lf = it.next();
+            if (!lf.isAlive()) {
+                it.remove();
             }
         }
     }
