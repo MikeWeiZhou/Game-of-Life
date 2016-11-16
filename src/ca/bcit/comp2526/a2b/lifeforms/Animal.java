@@ -4,16 +4,16 @@ import ca.bcit.comp2526.a2b.World;
 import ca.bcit.comp2526.a2b.grids.Node;
 import ca.bcit.comp2526.a2b.grids.Terrain;
 
+import java.util.Random;
+
 /**
  * Animal.
  *
  * @author  Wei Zhou
- * @version 2016-11-14
+ * @version 2016-11-15
  * @since   2016-11-08
  */
 public abstract class Animal extends Lifeform {
-
-    private Node targetNode;
 
     /**
      * Constructs a new Animal.
@@ -30,7 +30,7 @@ public abstract class Animal extends Lifeform {
      */
     @Override
     public void init() {
-        if (getVisionLevel() == 0 || getTargetTrait() == null) {
+        if (getMovement() == 0 || getTargetTrait() == null) {
             throw new IllegalStateException();
         }
 
@@ -42,20 +42,24 @@ public abstract class Animal extends Lifeform {
      */
     @Override
     public void takeAction() {
-        targetNode = findTarget();
-        eat(targetNode);
-        moveTo(targetNode);
+        Node target;
 
-        targetNode = null;
+        target = findTarget();
+        eatAt(target);
+        moveTo(target);
+
         super.takeAction();
     }
 
     /**
-     * Finds suitable target Node to eat and/or moveTo.
+     * Finds and returns a suitable target Node to eatAt and/or move.
+     * @return a suitable target Node to eatAt/move
      */
     protected Node findTarget() {
-        final Node[] targets = getNode().getNeighborsForLevel(getVisionLevel());
+        final Node[] targets = getNode().getNeighborsFor(this);
               Node   target  = null;
+
+        shuffleNodes(targets);
 
         for (Node n : targets) {
             if (n.getTerrain() == getInhabitable()) {
@@ -66,7 +70,7 @@ public abstract class Animal extends Lifeform {
             if (lf == null) {
                 if (target == null) {
                     target = n;
-                } else if (n.getTerrain() == Terrain.WATER) {
+                } else if (n.getTerrain().equals(Terrain.WATER)) {
                     target = n;
                 }
             } else if (lf.hasTrait(getTargetTrait())) {
@@ -82,13 +86,17 @@ public abstract class Animal extends Lifeform {
      * Eats Lifeform at target Node, if edible.
      * @param target    Node
      */
-    protected void eat(final Node target) {
-        final Lifeform targetLF = getWorld().getLifeformAt(target);
-        if (targetLF != null && targetLF.isAlive() && targetLF.hasTrait(getTargetTrait())) {
-            targetLF.kill();
+    protected void eatAt(final Node target) {
+        if (target == null) {
+            return;
+        }
 
-            // +1 due to eat first then moveTo in logic
-            // suppose to moveTo in first, then eat
+        final Lifeform lf = getWorld().getLifeformAt(target);
+        if (lf != null && lf.hasTrait(getTargetTrait())) {
+            lf.kill();
+
+            // +1 due to age() being called after eating
+            // age() takes 1 health away
             setHealth(getMaxHealth() + 1);
         }
     }
@@ -98,8 +106,23 @@ public abstract class Animal extends Lifeform {
      * @param target    Node
      */
     protected void moveTo(final Node target) {
-        if (target != null) {
-            setNode(target);
+        if (target == null) {
+            return;
+        }
+
+        setNode(target);
+    }
+
+    /*
+     * Shuffles the order of an array of Nodes.
+     * @param nodes    to shuffle
+     */
+    private void shuffleNodes(final Node[] nodes) {
+        for (int i = 1; i < nodes.length / 2; i++) {
+            int rand    = getWorld().getRandom().nextInt(nodes.length);
+            Node tmp    = nodes[i];
+            nodes[i]    = nodes[rand];
+            nodes[rand] = tmp;
         }
     }
 }

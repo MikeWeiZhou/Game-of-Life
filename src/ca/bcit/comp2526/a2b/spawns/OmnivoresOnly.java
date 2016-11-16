@@ -24,7 +24,7 @@ public class OmnivoresOnly extends Spawn {
         addSpawnRate(LifeformType.OMNIVORE, 0.1f);
 
         addMortalityRate(LifeformType.PLANT,    0.01f);
-        addMortalityRate(LifeformType.OMNIVORE, 0.055f);
+        addMortalityRate(LifeformType.OMNIVORE, 0.06f);
 
         addTerraformRate(Terrain.WATER, 0.03f);
         addTerraformRate(Terrain.LAND,  0.97f);

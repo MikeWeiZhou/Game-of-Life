@@ -23,22 +23,22 @@ public class Omnivore extends Animal {
     private static final LifeformType TYPE;
     private static final Color        COLOR;
     private static final int          HEALTH;
-    private static final int          VISION;
+    private static final int          MOVEMENT;
     private static final Trait        TARGET;
 
-    private static final int          R_NEIGHBORS;
+    private static final int          R_PARTNERS;
     private static final int          R_EMPTY;
     private static final int          R_MAX_BABIES;
     private static final int          R_FOOD;
 
     static {
-        TYPE        = LifeformType.OMNIVORE;
-        COLOR       = Color.magenta;
-        HEALTH      = 4;
-        VISION      = 1;
-        TARGET      = Trait.OMNIVORE_EDIBLE;
+        TYPE     = LifeformType.OMNIVORE;
+        COLOR    = Color.magenta;
+        HEALTH   = 4;
+        MOVEMENT = 1;
+        TARGET   = Trait.OMNIVORE_EDIBLE;
 
-        R_NEIGHBORS  = 1;
+        R_PARTNERS   = 1;
         R_EMPTY      = 3;
         R_MAX_BABIES = 1;
         R_FOOD       = 3;
@@ -51,10 +51,12 @@ public class Omnivore extends Animal {
      */
     public Omnivore(final Node node, final World world) {
         super(TYPE, node, world);
+        setColor(COLOR);
         setDefaultColor(COLOR);
+        setHealth(HEALTH);
         setMaxHealth(HEALTH);
-        setVisionLevel(VISION);
-        setSexConditions(R_NEIGHBORS, R_EMPTY, R_MAX_BABIES, R_FOOD);
+        setMovement(MOVEMENT);
+        setSexConditions(R_PARTNERS, R_EMPTY, R_MAX_BABIES, R_FOOD);
         setTargetTrait(TARGET);
 
         addTrait(Trait.CARNIVORE_EDIBLE);

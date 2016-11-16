@@ -21,7 +21,7 @@ import java.awt.geom.Rectangle2D;
 public class SquareRenderer extends Renderer {
 
     // size of plants (0.1 - 1.0)
-    private static final float PLANT_SIZE  = 0.8f;
+    private static final float PLANT_SIZE  = 1f;
 
     // size of others (0.1 - 1.0)
     private static final float OTHER_SIZE = 0.8f;

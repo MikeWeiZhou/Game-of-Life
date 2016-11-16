@@ -1,14 +1,16 @@
 package ca.bcit.comp2526.a2b.grids;
 
-import java.awt.*;
-import java.util.HashMap;
-import java.util.Map;
+import ca.bcit.comp2526.a2b.lifeforms.Lifeform;
+
+import java.awt.Color;
+import java.awt.Point;
+import java.util.*;
 
 /**
  * Node.
  *
  * @author  Wei Zhou
- * @version 2016-11-12
+ * @version 2016-11-15
  * @since   2016-11-06
  */
 public class Node {
@@ -33,11 +35,13 @@ public class Node {
      * @param col          of this Node
      */
     public Node(final Point point, final int row, final int col) {
-        neighbors  = new HashMap<Integer, Node[]>();
-        this.point = point;
-        this.row   = row;
-        this.col   = col;
+        this.neighbors      = new HashMap<Integer, Node[]>();
+        this.point          = point;
+        this.row            = row;
+        this.col            = col;
     }
+
+// ------------------------------------------- SETTERS ---------------------------------------------
 
     /**
      * Sets the neighboring Nodes.
@@ -49,19 +53,21 @@ public class Node {
     }
 
     /**
-     * Returns neighboring Nodes.
-     * @param lvl    levels of neighboring Nodes to retrieve
-     * @return neighboring Nodes
-     */
-    public Node[] getNeighborsForLevel(final int lvl) {
-        return neighbors.get(lvl);
-    }
-
-    /**
      * Sets the Terrain of this Node.
      */
     public void setTerrain(final Terrain terrain) {
         this.terrain = terrain;
+    }
+
+// ------------------------------------------- GETTERS ---------------------------------------------
+
+    /**
+     * Returns neighboring Nodes.
+     * @param lf    Lifeform that is looking around
+     * @return neighboring Nodes
+     */
+    public Node[] getNeighborsFor(final Lifeform lf) {
+        return neighbors.get(lf.getMovement());
     }
 
     /**

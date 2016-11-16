@@ -3,8 +3,7 @@ package ca.bcit.comp2526.a2b.spawns;
 import ca.bcit.comp2526.a2b.World;
 import ca.bcit.comp2526.a2b.grids.Node;
 import ca.bcit.comp2526.a2b.grids.Terrain;
-import ca.bcit.comp2526.a2b.lifeforms.Lifeform;
-import ca.bcit.comp2526.a2b.lifeforms.LifeformType;
+import ca.bcit.comp2526.a2b.lifeforms.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -14,25 +13,19 @@ import java.util.*;
  * Spawn.
  *
  * @author  Wei Zhou
- * @version 2016-11-13
+ * @version 2016-11-15
  * @since   2016-11-06
  */
 public abstract class Spawn {
 
-    public static final LifeformType LIFELESS_TYPE;
-
-    private static final String PACKAGE_NAME;
-    private static final Map<LifeformType, String> CLASS_NAMES;
+    private static final Map<LifeformType, Class<? extends Lifeform>> CLASSES;
 
     static {
-        LIFELESS_TYPE = LifeformType.LIFELESS;
-        PACKAGE_NAME  = "ca.bcit.comp2526.a2b.lifeforms";
-
-        CLASS_NAMES = new HashMap<LifeformType, String>();
-        CLASS_NAMES.put(LifeformType.PLANT,     "Plant");
-        CLASS_NAMES.put(LifeformType.HERBIVORE, "Herbivore");
-        CLASS_NAMES.put(LifeformType.OMNIVORE,  "Omnivore");
-        CLASS_NAMES.put(LifeformType.CARNIVORE, "Carnivore");
+        CLASSES = new HashMap<LifeformType, Class<? extends Lifeform>>();
+        CLASSES.put(LifeformType.PLANT,     Plant.class);
+        CLASSES.put(LifeformType.HERBIVORE, Herbivore.class);
+        CLASSES.put(LifeformType.OMNIVORE,  Omnivore.class);
+        CLASSES.put(LifeformType.CARNIVORE, Carnivore.class);
     }
 
     private final World                        world;
@@ -58,15 +51,13 @@ public abstract class Spawn {
     }
 
     /**
-     * Throws an error if Spawn in an illegal state.
-     * Then finalizes spawn and terraform rates.
+     * Throws an error if Spawn in an illegal state. Then finalizes spawn rates.
      */
     public void init() {
-        if (spawnRate.size() != mortalityRates.size()) {
+        if (spawnRate.size() != mortalityRates.size() || terraformIndex != 1f) {
             throw new IllegalStateException();
         }
 
-        addTerraformRate(null, 1.0f);
         addSpawnRate(null, 1.0f);
     }
 
@@ -102,7 +93,7 @@ public abstract class Spawn {
     /**
      * Returns a Terrain based on selected probabilities.
      */
-    public Terrain getTerrain() {
+    public Terrain getRandomTerrain() {
         final float randomKey = terraformRate.lowerKey(random.nextFloat());
         return terraformRate.get(randomKey);
     }
@@ -128,16 +119,15 @@ public abstract class Spawn {
      * @return Lifeform or null
      */
     public Lifeform spawnAt(final Node node, final LifeformType lft) {
-        final Constructor constructor;
-        final Lifeform    lf;
-
-        if (lft == null) {
+        if (node == null || lft == null) {
             return null;
         }
 
+        final Constructor constructor;
+        final Lifeform    lf;
+
         try {
-            constructor = Class.forName(PACKAGE_NAME + "." + CLASS_NAMES.get(lft))
-                    .getConstructor(Node.class, World.class);
+            constructor = CLASSES.get(lft).getConstructor(Node.class, World.class);
             lf = (Lifeform) constructor.newInstance(node, world);
 
             if (!node.getTerrain().equals(lf.getInhabitable())) {
@@ -145,21 +135,17 @@ public abstract class Spawn {
                 lf.init();
                 return lf;
             }
-        } catch (final ClassNotFoundException ex) {
-            System.err.println("Cannot find class: " + CLASS_NAMES.get(lft));
-            System.exit(1);
         } catch (final InstantiationException ex) {
-            System.err.println("Error creating: " + CLASS_NAMES.get(lft));
+            System.err.println("Error creating: " + lft);
             System.exit(1);
         } catch (final IllegalAccessException ex) {
-            System.err.println(CLASS_NAMES.get(lft) + " must have a public constructor");
+            System.err.println(lft + " must have a public constructor");
             System.exit(1);
         } catch (final NoSuchMethodException ex) {
-            System.err.println("No such method in creating: " + CLASS_NAMES.get(lft));
+            System.err.println("No such constructor in creating: " + lft);
             System.exit(1);
         } catch (final InvocationTargetException ex) {
-            System.err.println("Error in creating constructor for class: "
-                    + CLASS_NAMES.get(lft));
+            System.err.println("Error in invoking class: " + lft);
             System.exit(1);
         }
 

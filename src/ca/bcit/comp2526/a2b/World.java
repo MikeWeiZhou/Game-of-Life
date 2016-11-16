@@ -2,10 +2,8 @@ package ca.bcit.comp2526.a2b;
 
 import ca.bcit.comp2526.a2b.grids.*;
 import ca.bcit.comp2526.a2b.lifeforms.Lifeform;
-import ca.bcit.comp2526.a2b.lifeforms.LifeformType;
 import ca.bcit.comp2526.a2b.renderers.Renderer;
 import ca.bcit.comp2526.a2b.renderers.SquareRenderer;
-import ca.bcit.comp2526.a2b.spawns.AncientPhytophagous;
 import ca.bcit.comp2526.a2b.spawns.NaturalSpawn;
 import ca.bcit.comp2526.a2b.spawns.Spawn;
 
@@ -16,7 +14,7 @@ import java.util.*;
  * World.
  *
  * @author  Wei Zhou
- * @version 2016-11-13
+ * @version 2016-11-16
  * @since   2016-11-06
  */
 public class World {
@@ -33,18 +31,13 @@ public class World {
     public World(final JFrame frame) {
         random    = new Random();
         lifeforms = new ArrayList<Lifeform>();
-        grid      = new SquareGrid(60, 40, 15);
+        grid      = new SquareGrid(65, 40, 10);
         spawn     = new NaturalSpawn(this);
         renderer  = new SquareRenderer(frame, this);
     }
 
     /**
      * Initializes this World.
-     *
-     * <p>
-     * <b>Assumes</b> this method is called only after the Grid object is
-     * constructed and initialized.
-     * </p>
      */
     public void init() {
         grid.init();
@@ -58,7 +51,7 @@ public class World {
      */
     public void takeTurn() {
 
-        // all alive Lifeforms take action
+        // all living Lifeforms take action
         ListIterator<Lifeform> it = lifeforms.listIterator();
         while (it.hasNext()) {
             Lifeform lf = it.next();
@@ -82,6 +75,42 @@ public class World {
             createWorld();
         }
     }
+
+    /*
+     * Populates the World with Terrain and Lifeforms.
+     */
+    private void createWorld() {
+        Node     n;
+        Terrain  t;
+        Lifeform lf;
+
+        for (int row = 0; row < getGrid().getRows(); row++) {
+            for (int col = 0; col < getGrid().getCols(); col++) {
+                n = getGrid().getNodeAt(row, col);
+                t = getSpawn().getRandomTerrain();
+                n.setTerrain(t);
+
+                lf = getSpawn().spawnAt(n);
+                if (lf != null) {
+                    lifeforms.add(lf);
+                }
+            }
+        }
+    }
+
+    /*
+     * Removes all dead Lifeforms.
+     */
+    private void removeDeadLifeforms() {
+        Iterator<Lifeform> it = lifeforms.iterator();
+        while (it.hasNext()) {
+            if (!it.next().isAlive()) {
+                it.remove();
+            }
+        }
+    }
+
+// ------------------------------------------ GETTERS ----------------------------------------------
 
     /**
      * Returns the Random generator from this World.
@@ -116,7 +145,7 @@ public class World {
     }
 
     /**
-     * Returns the Lifeform at the specified row and column.
+     * Returns the Lifeform at the specified row and column, or null.
      * @param node    to check
      * @return Lifeform or null
      */
@@ -127,40 +156,5 @@ public class World {
             }
         }
         return null;
-    }
-
-    /*
-     * Populates the World with Terrain and Lifeforms.
-     */
-    private void createWorld() {
-        Node     n;
-        Terrain  t;
-        Lifeform lf;
-
-        for (int row = 0; row < grid.getRows(); row++) {
-            for (int col = 0; col < grid.getCols(); col++) {
-                n = grid.getNodeAt(row, col);
-                t = spawn.getTerrain();
-                n.setTerrain(t);
-
-                lf = spawn.spawnAt(n);
-                if (lf != null) {
-                    lifeforms.add(lf);
-                }
-            }
-        }
-    }
-
-    /*
-     * Removes all dead Lifeforms.
-     */
-    private void removeDeadLifeforms() {
-        Iterator<Lifeform> it = lifeforms.iterator();
-        while (it.hasNext()) {
-            Lifeform lf = it.next();
-            if (!lf.isAlive()) {
-                it.remove();
-            }
-        }
     }
 }

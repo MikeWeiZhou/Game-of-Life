@@ -10,7 +10,7 @@ import java.awt.Color;
  * Carnivore.
  *
  * @author  Wei Zhou
- * @version 2016-11-13
+ * @version 2016-11-14
  * @since   2016-11-13
  */
 public class Carnivore extends Animal {
@@ -18,11 +18,11 @@ public class Carnivore extends Animal {
     private static final LifeformType TYPE;
     private static final Color        COLOR;
     private static final int          HEALTH;
-    private static final int          VISION;
+    private static final int          MOVEMENT;
     private static final Trait        TARGET;
     private static final Terrain      INHABITABLE;
 
-    private static final int          R_NEIGHBORS;
+    private static final int          R_PARTNERS;
     private static final int          R_EMPTY;
     private static final int          R_MAX_BABIES;
     private static final int          R_FOOD;
@@ -31,11 +31,11 @@ public class Carnivore extends Animal {
         TYPE        = LifeformType.CARNIVORE;
         COLOR       = Color.red;
         HEALTH      = 3;
-        VISION      = 2;
+        MOVEMENT    = 2;
         TARGET      = Trait.CARNIVORE_EDIBLE;
         INHABITABLE = Terrain.WATER;
 
-        R_NEIGHBORS  = 1;
+        R_PARTNERS   = 1;
         R_EMPTY      = 3;
         R_MAX_BABIES = 1;
         R_FOOD       = 3;
@@ -48,10 +48,12 @@ public class Carnivore extends Animal {
      */
     public Carnivore(final Node node, final World world) {
         super(TYPE, node, world);
+        setColor(COLOR);
         setDefaultColor(COLOR);
+        setHealth(HEALTH);
         setMaxHealth(HEALTH);
-        setVisionLevel(VISION);
-        setSexConditions(R_NEIGHBORS, R_EMPTY, R_MAX_BABIES, R_FOOD);
+        setMovement(MOVEMENT);
+        setSexConditions(R_PARTNERS, R_EMPTY, R_MAX_BABIES, R_FOOD);
         setTargetTrait(TARGET);
         setInhabitable(INHABITABLE);
 

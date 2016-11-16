@@ -15,10 +15,12 @@ import java.util.Set;
  * Lifeform.
  *
  * @author  Wei Zhou
- * @version 2016-11-14
+ * @version 2016-11-15
  * @since   2016-11-06
  */
 public abstract class Lifeform {
+
+    private final static Terrain FOUNTAIN_OF_YOUTH = Terrain.WATER;
 
     // mandatory settings to set
     private final World        world;
@@ -31,15 +33,15 @@ public abstract class Lifeform {
     private       int          health;
     private       int          maxHealth;
     private       float        mortalityRate;
+    private       int          movement;
 
     // mandatory: reproduction settings
     private       int          repNeighborsAlike;
     private       int          repNeighborsEmpty;
     private       int          repMaxBabies;
-    private       int          repNeighborsFood; // optional
+    private       int          repNeighborsFood;
 
     // optional settings to set
-    private       int          visionLevel;
     private       Trait        targetTrait;
     private       Terrain      inhabitable;
 
@@ -61,19 +63,21 @@ public abstract class Lifeform {
      * Throws an error if Lifeform is in an illegal state.
      */
     public void init() {
-        if (getDefaultColor() == null || getMaxHealth() == 0 || getMortalityRate() == 0 ||
+        if (getDefaultColor() == null  || getMaxHealth() == 0    || getMortalityRate() == 0 ||
+                getColor() == null     || getHealth() == 0       || getMovement() == 0 ||
                 repNeighborsAlike == 0 || repNeighborsEmpty == 0 || repMaxBabies == 0) {
 
             throw new IllegalStateException();
         }
     }
 
+// ---------------------------------------- TAKE TURN ----------------------------------------------
+
     /**
-     * Sets the mortality rate for this Lifeform.
-     * @param rate    mortality rate
+     * Take action.
      */
-    public void setMortalityRate(final float rate) {
-        mortalityRate = rate;
+    public void takeAction() {
+        age();
     }
 
     /**
@@ -87,7 +91,7 @@ public abstract class Lifeform {
         int emptyNearby    = 0;
         int foodNearby     = 0;
             emptyNodes     = new ArrayList<Node>();
-            nearby         = getNode().getNeighborsForLevel(getVisionLevel());
+            nearby         = getNode().getNeighborsFor(this);
 
         // determine conditions
         for (Node n : nearby) {
@@ -117,18 +121,189 @@ public abstract class Lifeform {
     }
 
     /**
-     * Take action.
+     * Kills this Lifeform.
      */
-    public void takeAction() {
-        if (!getNode().getTerrain().equals(Terrain.WATER)) {
+    protected void kill() {
+        alive = false;
+    }
+
+    /**
+     * Kills this Lifeform if health is down to zero, or cancer develops and it dies.
+     */
+    protected void age() {
+        final float rand = getWorld().getRandom().nextFloat();
+
+        if (!getNode().getTerrain().equals(FOUNTAIN_OF_YOUTH)) {
             setHealth(getHealth() - 1);
         }
 
-        if (health <= 0 || naturalDeath()) {
+        if (getHealth() <= 0 || (0 <= rand && rand <= getMortalityRate())) {
             kill();
         } else {
-            setColor(calcColor(defaultColor, health, maxHealth));
+            changeColor();
         }
+    }
+
+    /**
+     * Changes the Color shade for a Lifeform given the current and maximum health.
+     */
+    protected void changeColor() {
+        final float fraction = Math.min(1, (float) getHealth() / getMaxHealth());
+        final int r = (int) Math.round(Math.max(0, getDefaultColor().getRed() * fraction));
+        final int g = (int) Math.round(Math.max(0, getDefaultColor().getGreen() * fraction));
+        final int b = (int) Math.round(Math.max(0, getDefaultColor().getBlue() * fraction));
+        setColor(new Color(r, g, b, getDefaultColor().getAlpha()));
+    }
+
+    /**
+     * Creates and returns an array of newborns for this Lifeform.
+     * @param empty        Iterator for empty Nodes where babies can live in
+     * @param maxBabies    to produce of this LifeformType
+     * @return array of newborn Lifeforms
+     */
+    protected Lifeform[] makeBabies(final Iterator<Node> empty, int maxBabies) {
+        final List<Lifeform> newborns = new ArrayList<Lifeform>();
+
+        while (empty.hasNext() && maxBabies > 0) {
+            Node n = empty.next();
+            Lifeform lf;
+
+            if (n.getTerrain().equals(getInhabitable())) {
+                continue;
+            }
+
+            lf = getWorld().getSpawn().spawnAt(n, getLifeformType());
+            if (lf != null) {
+                newborns.add(lf);
+            }
+
+            empty.remove();
+            --maxBabies;
+        }
+
+        return newborns.toArray(new Lifeform[newborns.size()]);
+    }
+
+// ----------------------------------------- SETTERS -----------------------------------------------
+
+    /**
+     * Sets the mortality rate for this Lifeform.
+     * @param rate    mortality rate
+     */
+    public void setMortalityRate(final float rate) {
+        mortalityRate = rate;
+    }
+
+    /**
+     * Adds a Trait to this Lifeform.
+     * @param trait    to add
+     */
+    protected void addTrait(final Trait trait) {
+        traits.add(trait);
+    }
+
+    /**
+     * Removes Trait from this Lifeform.
+     * @param trait    to remove
+     */
+    protected void removeTrait(final Trait trait) {
+        traits.remove(trait);
+    }
+
+    /**
+     * Sets the reproduction requirements of this Lifeform.
+     * @param neighbors    minimum number of same species nearby
+     * @param empty        minimum empty Nodes nearby
+     * @param maxBabies    that can be reproduced
+     * @param food         minimum food sources nearby
+     */
+    protected void setSexConditions(final int neighbors, final int empty,
+                                    final int maxBabies, final int food) {
+        repNeighborsAlike = neighbors;
+        repNeighborsEmpty = empty;
+        repMaxBabies      = maxBabies;
+        repNeighborsFood  = food;
+    }
+
+    /**
+     * Sets the inhabitable Terrain for this Animal.
+     * @param terrain    that is inhabitable for this Animal
+     */
+    protected void setInhabitable(final Terrain terrain) {
+        inhabitable = terrain;
+    }
+
+    /**
+     * Sets the Trait that Animal looks for in a target.
+     * @param trait    of preys
+     */
+    protected void setTargetTrait(final Trait trait) {
+        targetTrait = trait;
+    }
+
+    /**
+     * Set the max movement of this Animal.
+     * @param movement    max movement
+     */
+    protected void setMovement(final int movement) {
+        this.movement = movement;
+    }
+
+    /**
+     * Sets the Node that this Lifeform is in.
+     * @param node    that Lifeform will move to
+     */
+    protected void setNode(final Node node) {
+        this.node = node;
+    }
+
+    /**
+     * Sets the Color of this Lifeform.
+     */
+    protected void setColor(final Color color) {
+        this.color = color;
+    }
+
+    /**
+     * Sets the default Color of this Lifeform.
+     */
+    protected void setDefaultColor(final Color color) {
+        this.defaultColor = color;
+    }
+
+    /**
+     * Sets the health of this Lifeform.
+     * @param health    for this Lifeform
+     */
+    protected void setHealth(final int health) {
+        this.health = health;
+    }
+
+    /**
+     * Sets the max health of this Lifeform.
+     * @param health    max health for this Lifeform
+     */
+    protected void setMaxHealth(final int health) {
+        this.maxHealth = health;
+    }
+
+// ------------------------------------------ GETTERS ----------------------------------------------
+
+    /**
+     * Returns true if this Lifeform has specified Trait.
+     * @param trait    to check
+     * @return true if Trait exists
+     */
+    public boolean hasTrait(final Trait trait) {
+        return traits.contains(trait);
+    }
+
+    /**
+     * Returns true if this Lifeform is alive.
+     * @return boolean
+     */
+    public boolean isAlive() {
+        return alive;
     }
 
     /**
@@ -155,20 +330,19 @@ public abstract class Lifeform {
     }
 
     /**
+     * Returns the health of this Lifeform.
+     * @return health
+     */
+    public int getHealth() {
+        return health;
+    }
+
+    /**
      * Returns the max health for this Lifeform.
      * @return max health
      */
     public int getMaxHealth() {
         return maxHealth;
-    }
-
-    /**
-     * Returns true if this Lifeform has specified Trait.
-     * @param trait    to check
-     * @return true if Trait exists
-     */
-    public boolean hasTrait(final Trait trait) {
-        return traits.contains(trait);
     }
 
     /**
@@ -195,14 +369,6 @@ public abstract class Lifeform {
     }
 
     /**
-     * Returns the natural death ratio of this Lifeform.
-     * @return natural death ratio
-     */
-    public float getMortalityRate() {
-        return mortalityRate;
-    }
-
-    /**
      * Returns the default Color of this Lifeform.
      * @return default Color
      */
@@ -211,189 +377,17 @@ public abstract class Lifeform {
     }
 
     /**
-     * Returns the vision level for this animal.
+     * Returns the natural death ratio of this Lifeform.
+     * @return natural death ratio
      */
-    protected int getVisionLevel() {
-        return visionLevel;
+    public float getMortalityRate() {
+        return mortalityRate;
     }
 
     /**
-     * Returns the health of this Lifeform.
-     * @return health
+     * Returns the max movement for this animal.
      */
-    public int getHealth() {
-        return health;
-    }
-
-    /**
-     * Returns true if this Lifeform is alive.
-     * @return boolean
-     */
-    public boolean isAlive() {
-        return alive;
-    }
-
-    /**
-     * Sets the reproduction requirements of this Lifeform.
-     * @param neighbors    minimum number of same species nearby
-     * @param empty        minimum empty Nodes nearby
-     * @param maxBabies    that can be reproduced
-     */
-    protected void setSexConditions(final int neighbors, final int empty,
-                                                         final int maxBabies) {
-        repNeighborsAlike = neighbors;
-        repNeighborsEmpty = empty;
-        repMaxBabies      = maxBabies;
-    }
-
-    /**
-     * Sets the reproduction requirements of this Lifeform.
-     * @param neighbors    minimum number of same species nearby
-     * @param empty        minimum empty Nodes nearby
-     * @param maxBabies    that can be reproduced
-     * @param food         minimum food sources nearby
-     */
-    protected void setSexConditions(final int neighbors, final int empty,
-                                    final int maxBabies, final int food) {
-        setSexConditions(neighbors, empty, maxBabies);
-        repNeighborsFood = food;
-    }
-
-    /**
-     * Sets the inhabitable Terrain for this Animal.
-     * @param terrain    that is inhabitable for this Animal
-     */
-    protected void setInhabitable(final Terrain terrain) {
-        inhabitable = terrain;
-    }
-
-    /**
-     * Sets the Trait that Animal looks for in a target.
-     * @param trait    of preys
-     */
-    protected void setTargetTrait(final Trait trait) {
-        targetTrait = trait;
-    }
-
-    /**
-     * Set the vision level of this Animal.
-     * @param vl    vision level
-     */
-    protected void setVisionLevel(final int vl) {
-        visionLevel = vl;
-    }
-
-    /**
-     * Sets the Node that this Lifeform is in.
-     * @param node    that Lifeform will move to
-     */
-    protected void setNode(final Node node) {
-        this.node = node;
-    }
-
-    /**
-     * Adds a Trait to this Lifeform.
-     * @param trait    to add
-     */
-    protected void addTrait(final Trait trait) {
-        traits.add(trait);
-    }
-
-    /**
-     * Removes Trait from this Lifeform.
-     * @param trait    to remove
-     */
-    protected void removeTrait(final Trait trait) {
-        traits.remove(trait);
-    }
-
-    /**
-     * Sets the Color of this Lifeform.
-     */
-    protected void setColor(final Color color) {
-        this.color = color;
-    }
-
-    /**
-     * Sets the default Color of this Lifeform.
-     */
-    protected void setDefaultColor(final Color color) {
-        this.defaultColor = color;
-        setColor(color);
-    }
-
-    /**
-     * Sets the health of this Lifeform.
-     * @param health    for this Lifeform
-     */
-    protected void setHealth(final int health) {
-        this.health = health;
-    }
-
-    /**
-     * Sets the max health of this Lifeform.
-     * @param health    max health for this Lifeform
-     */
-    protected void setMaxHealth(final int health) {
-        this.maxHealth = health;
-        setHealth(health);
-    }
-
-    /**
-     * Kills this Lifeform.
-     */
-    protected void kill() {
-        alive = false;
-    }
-
-    /**
-     * Returns true if this Lifeform should die of naturalDeath.
-     * @return true if Lifeform should die
-     */
-    protected boolean naturalDeath() {
-        final float rand = getWorld().getRandom().nextFloat();
-        return 0 <= rand && rand <= getMortalityRate();
-    }
-
-    /**
-     * Calculates and returns the right Color shade for a Lifeform given current and maximum health.
-     * @param baseColor        to calculate shade for
-     * @param currentHealth    of Lifeform
-     * @param maxHealth        of Lifeform
-     * @return a different shade of baseColor
-     */
-    protected Color calcColor(final Color baseColor, final int currentHealth, final int maxHealth) {
-        final float fraction = Math.min(1, (float) getHealth() / getMaxHealth());
-        final int r = (int) Math.round(Math.max(0, baseColor.getRed() * fraction));
-        final int g = (int) Math.round(Math.max(0, baseColor.getGreen() * fraction));
-        final int b = (int) Math.round(Math.max(0, baseColor.getBlue() * fraction));
-        return new Color(r, g, b, baseColor.getAlpha());
-    }
-
-    /**
-     * Creates and returns an array of newborns for this Lifeform.
-     * @param empty        Iterator for empty Nodes where babies can live in
-     * @param maxBabies    to produce of this LifeformType
-     * @return array of newborn Lifeforms
-     */
-    protected Lifeform[] makeBabies(final Iterator<Node> empty, int maxBabies) {
-        final List<Lifeform> newborns = new ArrayList<Lifeform>();
-
-        while (empty.hasNext() && maxBabies > 0) {
-            Node n = empty.next();
-            Lifeform lf;
-
-            if (n.getTerrain().equals(getInhabitable())) {
-                continue;
-            }
-
-            lf = getWorld().getSpawn().spawnAt(n, getLifeformType());
-            newborns.add(lf);
-
-            empty.remove();
-            --maxBabies;
-        }
-
-        return newborns.toArray(new Lifeform[newborns.size()]);
+    public int getMovement() {
+        return movement;
     }
 }
