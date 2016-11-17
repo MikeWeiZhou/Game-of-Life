@@ -22,7 +22,7 @@ import java.util.TreeMap;
  * Spawn.
  *
  * @author  Wei Zhou
- * @version 2016-11-15
+ * @version 2016-11-16
  * @since   2016-11-06
  */
 public abstract class Spawn {
@@ -44,6 +44,9 @@ public abstract class Spawn {
     private final Map<LifeformType, Float>     mortalityRates;
     private       float                        terraformIndex;
     private       float                        spawnIndex;
+    private       Terrain                      unspawnableTerrain;
+    private       Terrain                      convergingTerrain;
+    private       float                        convergingRate;
 
     /**
      * Constructs a Spawn.
@@ -68,6 +71,24 @@ public abstract class Spawn {
         }
 
         addSpawnRate(null, 1.0f);
+    }
+
+    /**
+     * Disallows spawning Lifeform on the specified Terrain.
+     * @param terrain    that cannot give birth to anything
+     */
+    protected void setUnspawnableTerrain(final Terrain terrain) {
+        unspawnableTerrain = terrain;
+    }
+
+    /**
+     * Sets the water convergence rate. (WARNING: exponential growth of Terrain.WATER once set)
+     * @param terrain    that Water Terrain converges at
+     * @param rate       that Water Terrain converges at
+     */
+    protected void setConvergingTerrain(final Terrain terrain, final float rate) {
+        convergingTerrain = terrain;
+        convergingRate    = rate;
     }
 
     /**
@@ -100,12 +121,32 @@ public abstract class Spawn {
     }
 
     /**
-     * Sets a random Terrain (based on selected probabilities) for the specified Node.
-     * @param node    to be terraformed
+     * Terraforms the specified Node into a random Terrain based on selected probabilities.
+     * @param location    Node
      */
-    public void terraformAt(final Node node) {
-        final float randomKey = terraformRate.lowerKey(random.nextFloat());
-        node.setTerrain(terraformRate.get(randomKey));
+    public void terraformAt(final Node location) {
+        Terrain terrain   = terraformRate.get(terraformRate.lowerKey(random.nextFloat()));
+        Node[]  neighbors = location.getImmediateNeighbors();
+
+        if (convergingRate > 0) {
+            float convergeProbability;
+            int   waterNeighborCount;
+
+            waterNeighborCount = 0;
+            for (Node neighbor : neighbors) {
+                Terrain neighborTerrain = neighbor.getTerrain();
+                if (neighborTerrain != null && neighborTerrain.equals(convergingTerrain)) {
+                    waterNeighborCount++;
+                }
+            }
+
+            convergeProbability = convergingRate * ((float) waterNeighborCount / neighbors.length);
+            if (waterNeighborCount > 0 && random.nextFloat() <= convergeProbability) {
+                terrain = convergingTerrain;
+            }
+        }
+
+        location.setTerrain(terrain);
     }
 
     /**
@@ -134,11 +175,13 @@ public abstract class Spawn {
         }
 
         try {
+            final Terrain terrain = node.getTerrain();
             final Constructor constructor = CLASSES.get(lft)
                     .getConstructor(Node.class, World.class);
             final Lifeform lf = (Lifeform) constructor.newInstance(node, world);
 
-            if (!node.getTerrain().equals(lf.getInhabitable())) {
+
+            if (!terrain.equals(unspawnableTerrain) && !terrain.equals(lf.getInhabitable())) {
                 lf.setMortalityRate(mortalityRates.get(lft));
                 lf.init();
                 return lf;

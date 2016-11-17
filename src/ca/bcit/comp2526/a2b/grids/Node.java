@@ -89,6 +89,14 @@ public class Node {
     }
 
     /**
+     * Returns immediate neighboring Nodes.
+     * @return neighboring Nodes
+     */
+    public Node[] getImmediateNeighbors() {
+        return neighbors.get(1);
+    }
+
+    /**
      * Returns the inhabiting Lifeform of this Node.
      * @return Lifeform
      */

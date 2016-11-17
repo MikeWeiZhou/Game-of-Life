@@ -28,6 +28,8 @@ import javax.swing.JFrame;
  */
 public class World {
 
+    private static final Terrain WATER = Terrain.WATER;
+
     private final Random         random;
     private final List<Lifeform> lifeforms;
     private final Grid           grid;
@@ -43,7 +45,7 @@ public class World {
     public World(final JFrame frame) {
         random    = new Random();
         lifeforms = new ArrayList<Lifeform>();
-        grid      = new SquareGrid(65, 40, 10);
+        grid      = new SquareGrid(160, 80, 5);
         spawn     = new NaturalSpawn(this);
         renderer  = new SquareRenderer(frame, this);
 
@@ -65,13 +67,11 @@ public class World {
      * Takes a turn.
      */
     public void takeTurn() {
-
-        long t1 = 0;
-        long t2;
-
-        if (++turnsTimed < 100) {
-            t1 = new Date().getTime();
-        }
+//        long t1 = 0;
+//        long t2;
+//        if (++turnsTimed < 100) {
+//            t1 = new Date().getTime();
+//        }
 
         // all living Lifeforms take action
         ListIterator<Lifeform> it = lifeforms.listIterator();
@@ -92,23 +92,18 @@ public class World {
         Collections.shuffle(lifeforms);
         renderer.update();
 
-        // restart game if no more lifeforms
-        if (lifeforms.size() == 0) {
-            createWorld();
-        }
-
-        if (turnsTimed < 100) {
-            t2 = new Date().getTime();
-            long avg = t2 - t1;
-            timer.add(avg);
-        } else {
-            long sum = 0;
-            for (long time : timer) {
-                sum += time;
-            }
-            long avg = sum / timer.size();
-            System.out.println("Average time per turn: " + avg);
-        }
+//        if (turnsTimed < 100) {
+//            t2 = new Date().getTime();
+//            long avg = t2 - t1;
+//            timer.add(avg);
+//        } else {
+//            long sum = 0;
+//            for (long time : timer) {
+//                sum += time;
+//            }
+//            long avg = sum / timer.size();
+//            System.out.println("Average time per turn: " + avg);
+//        }
     }
 
     /*
@@ -118,7 +113,9 @@ public class World {
         for (int row = 0; row < getGrid().getRows(); row++) {
             for (int col = 0; col < getGrid().getCols(); col++) {
                 Node location = getGrid().getNodeAt(row, col);
-                getSpawn().terraformAt(location); // Node needs Terrain before Lifeform can spawn
+
+                getSpawn().terraformAt(location);
+
                 Lifeform lf = getSpawn().spawnAt(location);
 
                 if (lf != null) {
