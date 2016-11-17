@@ -10,7 +10,7 @@ import java.util.*;
  * Node.
  *
  * @author  Wei Zhou
- * @version 2016-11-15
+ * @version 2016-11-16
  * @since   2016-11-06
  */
 public class Node {
@@ -24,10 +24,11 @@ public class Node {
     }
 
     private final Map<Integer, Node[]> neighbors;
-    private final Point   point;
-    private final int     row;
-    private final int     col;
-    private       Terrain terrain;
+    private final Point    point;
+    private final int      row;
+    private final int      col;
+    private       Terrain  terrain;
+    private       Lifeform inhabitant;
 
     /**
      * Constructs a Node.
@@ -44,19 +45,35 @@ public class Node {
 // ------------------------------------------- SETTERS ---------------------------------------------
 
     /**
+     * Removes inhabiting Lifeform from this Node.
+     */
+    public void removeInhabitant() {
+        inhabitant = null;
+    }
+
+    /**
+     * Sets the inhabiting Lifeform of this Node.
+     * @param lf    Lifeform
+     */
+    public void setInhabitant(final Lifeform lf) {
+        inhabitant = lf;
+    }
+
+    /**
+     * Sets the Terrain of this Node.
+     * @param terrain    for this Node
+     */
+    public void setTerrain(final Terrain terrain) {
+        this.terrain = terrain;
+    }
+
+    /**
      * Sets the neighboring Nodes.
      * @param lvl   level of neighbors to set
      * @param nb    neighbors of this Node
      */
     public void setNeighborsForLevel(final int lvl, final Node[] nb) {
         neighbors.put(lvl, nb);
-    }
-
-    /**
-     * Sets the Terrain of this Node.
-     */
-    public void setTerrain(final Terrain terrain) {
-        this.terrain = terrain;
     }
 
 // ------------------------------------------- GETTERS ---------------------------------------------
@@ -68,6 +85,14 @@ public class Node {
      */
     public Node[] getNeighborsFor(final Lifeform lf) {
         return neighbors.get(lf.getMovement());
+    }
+
+    /**
+     * Returns the inhabiting Lifeform of this Node.
+     * @return Lifeform
+     */
+    public Lifeform getInhabitant() {
+        return inhabitant;
     }
 
     /**

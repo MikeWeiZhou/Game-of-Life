@@ -15,7 +15,7 @@ import java.util.Set;
  * Lifeform.
  *
  * @author  Wei Zhou
- * @version 2016-11-15
+ * @version 2016-11-16
  * @since   2016-11-06
  */
 public abstract class Lifeform {
@@ -60,7 +60,7 @@ public abstract class Lifeform {
     }
 
     /**
-     * Throws an error if Lifeform is in an illegal state.
+     * Initializes Lifeform. Throws an error if Lifeform is in an illegal state.
      */
     public void init() {
         if (getDefaultColor() == null  || getMaxHealth() == 0    || getMortalityRate() == 0 ||
@@ -69,6 +69,8 @@ public abstract class Lifeform {
 
             throw new IllegalStateException();
         }
+
+        getLocation().setInhabitant(this);
     }
 
 // ---------------------------------------- TAKE TURN ----------------------------------------------
@@ -91,7 +93,7 @@ public abstract class Lifeform {
         int emptyNearby    = 0;
         int foodNearby     = 0;
             emptyNodes     = new ArrayList<Node>();
-            nearby         = getNode().getNeighborsFor(this);
+            nearby         = getLocation().getNeighborsFor(this);
 
         // determine conditions
         for (Node n : nearby) {
@@ -133,7 +135,7 @@ public abstract class Lifeform {
     protected void age() {
         final float rand = getWorld().getRandom().nextFloat();
 
-        if (!getNode().getTerrain().equals(FOUNTAIN_OF_YOUTH)) {
+        if (!getLocation().getTerrain().equals(FOUNTAIN_OF_YOUTH)) {
             setHealth(getHealth() - 1);
         }
 
@@ -251,10 +253,16 @@ public abstract class Lifeform {
 
     /**
      * Sets the Node that this Lifeform is in.
-     * @param node    that Lifeform will move to
+     * @param newLocation    that Lifeform will move to
      */
-    protected void setNode(final Node node) {
-        this.node = node;
+    protected void setLocation(final Node newLocation) {
+        if (newLocation == node) {
+            return;
+        }
+
+        node.removeInhabitant();
+        newLocation.setInhabitant(this);
+        node = newLocation;
     }
 
     /**
@@ -325,7 +333,7 @@ public abstract class Lifeform {
      * Returns the Node that this Lifeform is in.
      * @return Node
      */
-    public Node getNode() {
+    public Node getLocation() {
         return node;
     }
 

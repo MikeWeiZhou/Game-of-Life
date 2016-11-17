@@ -66,7 +66,7 @@ public class SquareRenderer extends Renderer {
 
         // draw Lifeforms
         for (int i = 0; i < lifeforms.length; i++) {
-            Node n = lifeforms[i].getNode();
+            Node n = lifeforms[i].getLocation();
             g2.setPaint(lifeforms[i].getColor());
 
             if (lifeforms[i].getLifeformType() == LifeformType.PLANT) {

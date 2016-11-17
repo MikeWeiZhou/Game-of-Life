@@ -21,9 +21,12 @@ public class World {
 
     private final Random         random;
     private final List<Lifeform> lifeforms;
-    private       Grid           grid;
-    private       Spawn          spawn;
-    private       Renderer       renderer;
+    private final Grid           grid;
+    private final Spawn          spawn;
+    private final Renderer       renderer;
+
+    private final List<Long>     timer;
+    private       int            turnsTimed;
 
     /**
      * Constructor.
@@ -34,6 +37,9 @@ public class World {
         grid      = new SquareGrid(65, 40, 10);
         spawn     = new NaturalSpawn(this);
         renderer  = new SquareRenderer(frame, this);
+
+        timer      = new ArrayList<Long>();
+        turnsTimed = 0;
     }
 
     /**
@@ -50,6 +56,12 @@ public class World {
      * Takes a turn.
      */
     public void takeTurn() {
+
+        long t1 = 0;
+        long t2;
+
+        if (++turnsTimed < 100)
+            t1 = new Date().getTime();
 
         // all living Lifeforms take action
         ListIterator<Lifeform> it = lifeforms.listIterator();
@@ -73,6 +85,19 @@ public class World {
         // restart game if no more lifeforms
         if (lifeforms.size() == 0) {
             createWorld();
+        }
+
+        if (turnsTimed < 100) {
+            t2 = new Date().getTime();
+            long avg = t2 - t1;
+            timer.add(avg);
+        } else {
+            long sum = 0;
+            for (long time : timer) {
+                sum += time;
+            }
+            long avg = sum / timer.size();
+            System.out.println("Average time per turn: " + avg);
         }
     }
 
@@ -150,11 +175,7 @@ public class World {
      * @return Lifeform or null
      */
     public Lifeform getLifeformAt(final Node node) {
-        for (Lifeform lf : lifeforms) {
-            if (lf.getNode() == node && lf.isAlive()) {
-                return lf;
-            }
-        }
-        return null;
+        final Lifeform lf = node.getInhabitant();
+        return (lf != null && lf.isAlive()) ? lf : null;
     }
 }

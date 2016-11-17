@@ -4,13 +4,11 @@ import ca.bcit.comp2526.a2b.World;
 import ca.bcit.comp2526.a2b.grids.Node;
 import ca.bcit.comp2526.a2b.grids.Terrain;
 
-import java.util.Random;
-
 /**
  * Animal.
  *
  * @author  Wei Zhou
- * @version 2016-11-15
+ * @version 2016-11-16
  * @since   2016-11-08
  */
 public abstract class Animal extends Lifeform {
@@ -56,7 +54,7 @@ public abstract class Animal extends Lifeform {
      * @return a suitable target Node to eatAt/move
      */
     protected Node findTarget() {
-        final Node[] targets = getNode().getNeighborsFor(this);
+        final Node[] targets = getLocation().getNeighborsFor(this);
               Node   target  = null;
 
         shuffleNodes(targets);
@@ -110,7 +108,7 @@ public abstract class Animal extends Lifeform {
             return;
         }
 
-        setNode(target);
+        setLocation(target);
     }
 
     /*

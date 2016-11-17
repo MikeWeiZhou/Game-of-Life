@@ -2,11 +2,18 @@ package ca.bcit.comp2526.a2b.grids;
 
 import java.awt.Dimension;
 
+/*
+ * TO DO:
+ *
+ *  - NEED CONFIRMATION: private int border: not needed, since each node stores
+ *      the coordinates x & y of each Node already.
+ */
+
 /**
  * Grid.
  *
  * @author  Wei Zhou
- * @version 2016-11-08
+ * @version 2016-11-16
  * @since   2016-11-06
  */
 public abstract class Grid {
@@ -45,6 +52,65 @@ public abstract class Grid {
         createNodes();
         linkNeighboringNodes();
     }
+
+    /*
+     * Creates all Nodes in Grid.
+     */
+    private void createNodes() {
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                nodes[row][col] = createNodeAt(row, col);
+            }
+        }
+    }
+
+    /*
+     * Calculates and links neighboring Cells for each Node.
+     */
+    private void linkNeighboringNodes() {
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                setAllLevelNeighborsFor(getNodeAt(row, col));
+            }
+        }
+    }
+
+    /*
+     * Sets all neighboring Nodes for the specified Node.
+     * @param node    to set neighbors for
+     */
+    private void setAllLevelNeighborsFor(final Node node) {
+        for (int lvl = 1; lvl <= NEIGHBOR_LEVELS; lvl++) {
+            node.setNeighborsForLevel(lvl, calcNeighborsForLevel(lvl, node));
+        }
+    }
+
+// ---------------------------------------- ABSTRACTS ----------------------------------------------
+
+    /**
+     * Calculates and returns the size of Grid.
+     * @return Dimension
+     */
+    protected abstract Dimension calcSize(int length);
+
+    /**
+     * Creates and returns a new Node at the specified row and column.
+     * @param row    that Node is in
+     * @param col    that Node is in
+     * @return new Node
+     */
+    protected abstract Node createNodeAt(int row, int col);
+
+    /**
+     * Calculates and returns all the neighboring Cells.
+     * @param lvl     level of neighbors to calculate
+     * @param node    used to calculate neighboring Cells
+     * @return neighboring Cells
+     */
+    protected abstract Node[] calcNeighborsForLevel(final int lvl,
+                                                    final Node node);
+
+// ----------------------------------------- GETTERS -----------------------------------------------
 
     /**
      * Returns true if row & column is in bounds.
@@ -108,58 +174,5 @@ public abstract class Grid {
      */
     public Dimension getSize() {
         return size;
-    }
-
-    /**
-     * Calculates and returns the size of Grid.
-     * @return Dimension
-     */
-    protected abstract Dimension calcSize(int length);
-
-    /**
-     * Creates and returns a new Node at the specified row and column.
-     * @param row    that Node is in
-     * @param col    that Node is in
-     * @return new Node
-     */
-    protected abstract Node createNodeAt(int row, int col);
-
-    /**
-     * Calculates and returns all the neighboring Cells.
-     * @param lvl     level of neighbors to calculate
-     * @param node    used to calculate neighboring Cells
-     * @return neighboring Cells
-     */
-    protected abstract Node[] calcNeighborsForLevel(final int lvl,
-                                                    final Node node);
-
-    /* Creates all Nodes in Grid.
-     */
-    private void createNodes() {
-        for (int row = 0; row < rows; row++) {
-            for (int col = 0; col < cols; col++) {
-                nodes[row][col] = createNodeAt(row, col);
-            }
-        }
-    }
-
-    /*
-     * Calculates and links neighboring Cells for each Node.
-     */
-    private void linkNeighboringNodes() {
-        for (int row = 0; row < rows; row++) {
-            for (int col = 0; col < cols; col++) {
-                setAllLevelNeighborsFor(getNodeAt(row, col));
-            }
-        }
-    }
-
-    /*
-     * Sets all neighboring Nodes for the specified Node.
-     */
-    private void setAllLevelNeighborsFor(final Node node) {
-        for (int lvl = 1; lvl <= NEIGHBOR_LEVELS; lvl++) {
-            node.setNeighborsForLevel(lvl, calcNeighborsForLevel(lvl, node));
-        }
     }
 }
