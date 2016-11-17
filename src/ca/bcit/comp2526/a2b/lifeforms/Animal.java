@@ -54,17 +54,18 @@ public abstract class Animal extends Lifeform {
      * @return a suitable target Node to eatAt/move
      */
     protected Node findTarget() {
-        final Node[] targets = getLocation().getNeighborsFor(this);
-              Node   target  = null;
+        final Node[] neighbors = getLocation().getNeighborsFor(this);
+        Node target = null;
 
-        shuffleNodes(targets);
+        shuffleNodes(neighbors);
 
-        for (Node n : targets) {
+        for (Node n : neighbors) {
             if (n.getTerrain() == getInhabitable()) {
                 continue;
             }
 
             Lifeform lf = getWorld().getLifeformAt(n);
+
             if (lf == null) {
                 if (target == null) {
                     target = n;

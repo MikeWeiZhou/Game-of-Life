@@ -85,7 +85,7 @@ public abstract class Grid {
         }
     }
 
-// ---------------------------------------- ABSTRACTS ----------------------------------------------
+    // ---------------------------------------- ABSTRACTS ------------------------------------------
 
     /**
      * Calculates and returns the size of Grid.
@@ -110,7 +110,7 @@ public abstract class Grid {
     protected abstract Node[] calcNeighborsForLevel(final int lvl,
                                                     final Node node);
 
-// ----------------------------------------- GETTERS -----------------------------------------------
+    // ----------------------------------------- GETTERS -------------------------------------------
 
     /**
      * Returns true if row & column is in bounds.
@@ -119,8 +119,8 @@ public abstract class Grid {
      * @return true if in bounds
      */
     public boolean inBounds(final int row, final int col) {
-        return 0 <= row && row < rows &&
-               0 <= col && col < cols;
+        return 0 <= row && row < rows
+            && 0 <= col && col < cols;
     }
 
     /**

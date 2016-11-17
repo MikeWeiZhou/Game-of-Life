@@ -3,11 +3,20 @@ package ca.bcit.comp2526.a2b.spawns;
 import ca.bcit.comp2526.a2b.World;
 import ca.bcit.comp2526.a2b.grids.Node;
 import ca.bcit.comp2526.a2b.grids.Terrain;
-import ca.bcit.comp2526.a2b.lifeforms.*;
+import ca.bcit.comp2526.a2b.lifeforms.Carnivore;
+import ca.bcit.comp2526.a2b.lifeforms.Herbivore;
+import ca.bcit.comp2526.a2b.lifeforms.Lifeform;
+import ca.bcit.comp2526.a2b.lifeforms.LifeformType;
+import ca.bcit.comp2526.a2b.lifeforms.Omnivore;
+import ca.bcit.comp2526.a2b.lifeforms.Plant;
+
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+import java.util.TreeMap;
 
 /**
  * Spawn.
@@ -91,11 +100,12 @@ public abstract class Spawn {
     }
 
     /**
-     * Returns a Terrain based on selected probabilities.
+     * Sets a random Terrain (based on selected probabilities) for the specified Node.
+     * @param node    to be terraformed
      */
-    public Terrain getRandomTerrain() {
+    public void terraformAt(final Node node) {
         final float randomKey = terraformRate.lowerKey(random.nextFloat());
-        return terraformRate.get(randomKey);
+        node.setTerrain(terraformRate.get(randomKey));
     }
 
     /**
@@ -123,12 +133,10 @@ public abstract class Spawn {
             return null;
         }
 
-        final Constructor constructor;
-        final Lifeform    lf;
-
         try {
-            constructor = CLASSES.get(lft).getConstructor(Node.class, World.class);
-            lf = (Lifeform) constructor.newInstance(node, world);
+            final Constructor constructor = CLASSES.get(lft)
+                    .getConstructor(Node.class, World.class);
+            final Lifeform lf = (Lifeform) constructor.newInstance(node, world);
 
             if (!node.getTerrain().equals(lf.getInhabitable())) {
                 lf.setMortalityRate(mortalityRates.get(lft));

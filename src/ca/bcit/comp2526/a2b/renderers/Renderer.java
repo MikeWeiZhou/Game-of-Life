@@ -3,13 +3,16 @@ package ca.bcit.comp2526.a2b.renderers;
 import ca.bcit.comp2526.a2b.World;
 import ca.bcit.comp2526.a2b.grids.Grid;
 import ca.bcit.comp2526.a2b.lifeforms.Lifeform;
-import ca.bcit.comp2526.a2b.lifeforms.LifeformType;
 
+
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.RenderingHints;
+import java.awt.Toolkit;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import java.awt.*;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Renderer.
@@ -25,11 +28,6 @@ public abstract class Renderer extends JPanel {
     static {
         TOOLKIT = Toolkit.getDefaultToolkit();
     }
-
-//    public static Renderer create(final RendererType rt, final JFrame frame,
-//                                                         final World  world) {
-//
-//    }
 
     private final JFrame frame;
     private final World  world;

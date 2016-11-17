@@ -4,7 +4,8 @@ import ca.bcit.comp2526.a2b.lifeforms.Lifeform;
 
 import java.awt.Color;
 import java.awt.Point;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Node.
@@ -15,7 +16,7 @@ import java.util.*;
  */
 public class Node {
 
-    private final static Map<Terrain, Color> COLOR;
+    private static final Map<Terrain, Color> COLOR;
 
     static {
         COLOR = new HashMap<Terrain, Color>();
@@ -42,7 +43,7 @@ public class Node {
         this.col            = col;
     }
 
-// ------------------------------------------- SETTERS ---------------------------------------------
+    // ------------------------------------------- SETTERS -----------------------------------------
 
     /**
      * Removes inhabiting Lifeform from this Node.
@@ -76,7 +77,7 @@ public class Node {
         neighbors.put(lvl, nb);
     }
 
-// ------------------------------------------- GETTERS ---------------------------------------------
+    // ------------------------------------------- GETTERS -----------------------------------------
 
     /**
      * Returns neighboring Nodes.

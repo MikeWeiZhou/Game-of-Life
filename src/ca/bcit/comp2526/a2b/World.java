@@ -1,14 +1,23 @@
 package ca.bcit.comp2526.a2b;
 
-import ca.bcit.comp2526.a2b.grids.*;
+import ca.bcit.comp2526.a2b.grids.Grid;
+import ca.bcit.comp2526.a2b.grids.Node;
+import ca.bcit.comp2526.a2b.grids.SquareGrid;
+import ca.bcit.comp2526.a2b.grids.Terrain;
 import ca.bcit.comp2526.a2b.lifeforms.Lifeform;
 import ca.bcit.comp2526.a2b.renderers.Renderer;
 import ca.bcit.comp2526.a2b.renderers.SquareRenderer;
 import ca.bcit.comp2526.a2b.spawns.NaturalSpawn;
 import ca.bcit.comp2526.a2b.spawns.Spawn;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Random;
 import javax.swing.JFrame;
-import java.util.*;
 
 /**
  * World.
@@ -60,8 +69,9 @@ public class World {
         long t1 = 0;
         long t2;
 
-        if (++turnsTimed < 100)
+        if (++turnsTimed < 100) {
             t1 = new Date().getTime();
+        }
 
         // all living Lifeforms take action
         ListIterator<Lifeform> it = lifeforms.listIterator();
@@ -105,17 +115,12 @@ public class World {
      * Populates the World with Terrain and Lifeforms.
      */
     private void createWorld() {
-        Node     n;
-        Terrain  t;
-        Lifeform lf;
-
         for (int row = 0; row < getGrid().getRows(); row++) {
             for (int col = 0; col < getGrid().getCols(); col++) {
-                n = getGrid().getNodeAt(row, col);
-                t = getSpawn().getRandomTerrain();
-                n.setTerrain(t);
+                Node location = getGrid().getNodeAt(row, col);
+                getSpawn().terraformAt(location); // Node needs Terrain before Lifeform can spawn
+                Lifeform lf = getSpawn().spawnAt(location);
 
-                lf = getSpawn().spawnAt(n);
                 if (lf != null) {
                     lifeforms.add(lf);
                 }
@@ -135,7 +140,7 @@ public class World {
         }
     }
 
-// ------------------------------------------ GETTERS ----------------------------------------------
+    // ------------------------------------------ GETTERS ------------------------------------------
 
     /**
      * Returns the Random generator from this World.

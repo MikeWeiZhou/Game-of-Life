@@ -6,10 +6,10 @@ import ca.bcit.comp2526.a2b.grids.Node;
 import ca.bcit.comp2526.a2b.lifeforms.Lifeform;
 import ca.bcit.comp2526.a2b.lifeforms.LifeformType;
 
-import javax.swing.JFrame;
 import java.awt.Graphics2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
+import javax.swing.JFrame;
 
 /**
  * SquareRenderer.
@@ -53,11 +53,11 @@ public class SquareRenderer extends Renderer {
         // draw Terrains
         for (int row = 0; row < grid.getRows(); row++) {
             for (int col = 0; col < grid.getCols(); col++) {
-                Node n = grid.getNodeAt(row, col);
-                g2.setPaint(n.getColor());
+                Node location = grid.getNodeAt(row, col);
+                g2.setPaint(location.getColor());
                 g2.fill(new Rectangle2D.Double(
-                        n.getPoint().x,
-                        n.getPoint().y,
+                        location.getPoint().x,
+                        location.getPoint().y,
                         length,
                         length
                 ));
@@ -66,20 +66,20 @@ public class SquareRenderer extends Renderer {
 
         // draw Lifeforms
         for (int i = 0; i < lifeforms.length; i++) {
-            Node n = lifeforms[i].getLocation();
+            Node location = lifeforms[i].getLocation();
             g2.setPaint(lifeforms[i].getColor());
 
             if (lifeforms[i].getLifeformType() == LifeformType.PLANT) {
                 g2.fill(new Rectangle2D.Double(
-                        n.getPoint().x + plantOffset,
-                        n.getPoint().y + plantOffset,
+                        location.getPoint().x + plantOffset,
+                        location.getPoint().y + plantOffset,
                         plantLen,
                         plantLen
                 ));
             } else {
                 g2.fill(new Ellipse2D.Double(
-                        n.getPoint().x + otherOffset,
-                        n.getPoint().y + otherOffset,
+                        location.getPoint().x + otherOffset,
+                        location.getPoint().y + otherOffset,
                         otherLen,
                         otherLen
                 ));

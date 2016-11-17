@@ -6,9 +6,9 @@ import ca.bcit.comp2526.a2b.grids.Terrain;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -20,7 +20,7 @@ import java.util.Set;
  */
 public abstract class Lifeform {
 
-    private final static Terrain FOUNTAIN_OF_YOUTH = Terrain.WATER;
+    private static final Terrain FOUNTAIN_OF_YOUTH = Terrain.WATER;
 
     // mandatory settings to set
     private final World        world;
@@ -63,9 +63,9 @@ public abstract class Lifeform {
      * Initializes Lifeform. Throws an error if Lifeform is in an illegal state.
      */
     public void init() {
-        if (getDefaultColor() == null  || getMaxHealth() == 0    || getMortalityRate() == 0 ||
-                getColor() == null     || getHealth() == 0       || getMovement() == 0 ||
-                repNeighborsAlike == 0 || repNeighborsEmpty == 0 || repMaxBabies == 0) {
+        if (getDefaultColor() == null  || getMaxHealth() == 0    || getMortalityRate() == 0
+             || getColor() == null     || getHealth() == 0       || getMovement() == 0
+             || repNeighborsAlike == 0 || repNeighborsEmpty == 0 || repMaxBabies == 0) {
 
             throw new IllegalStateException();
         }
@@ -73,7 +73,7 @@ public abstract class Lifeform {
         getLocation().setInhabitant(this);
     }
 
-// ---------------------------------------- TAKE TURN ----------------------------------------------
+    // ---------------------------------------- TAKE TURN ------------------------------------------
 
     /**
      * Take action.
@@ -86,18 +86,17 @@ public abstract class Lifeform {
      * Reproduce if sex conditions met.
      */
     public Lifeform[] reproduce() {
-        final List<Node> emptyNodes;
-        final Node[]     nearby;
+        final List<Node> emptyNodes = new ArrayList<Node>();
+        final Node[]     nearby     = getLocation().getNeighborsFor(this);
 
         int partnersNearby = 0;
         int emptyNearby    = 0;
         int foodNearby     = 0;
-            emptyNodes     = new ArrayList<Node>();
-            nearby         = getLocation().getNeighborsFor(this);
 
         // determine conditions
         for (Node n : nearby) {
             Lifeform lf = getWorld().getLifeformAt(n);
+
             if (lf == null) {
                 emptyNearby++;
                 emptyNodes.add(n);
@@ -167,14 +166,14 @@ public abstract class Lifeform {
         final List<Lifeform> newborns = new ArrayList<Lifeform>();
 
         while (empty.hasNext() && maxBabies > 0) {
-            Node n = empty.next();
+            Node location = empty.next();
             Lifeform lf;
 
-            if (n.getTerrain().equals(getInhabitable())) {
+            if (location.getTerrain().equals(getInhabitable())) {
                 continue;
             }
 
-            lf = getWorld().getSpawn().spawnAt(n, getLifeformType());
+            lf = getWorld().getSpawn().spawnAt(location, getLifeformType());
             if (lf != null) {
                 newborns.add(lf);
             }
@@ -186,7 +185,7 @@ public abstract class Lifeform {
         return newborns.toArray(new Lifeform[newborns.size()]);
     }
 
-// ----------------------------------------- SETTERS -----------------------------------------------
+    // ----------------------------------------- SETTERS -------------------------------------------
 
     /**
      * Sets the mortality rate for this Lifeform.
@@ -295,7 +294,7 @@ public abstract class Lifeform {
         this.maxHealth = health;
     }
 
-// ------------------------------------------ GETTERS ----------------------------------------------
+    // ------------------------------------------ GETTERS ------------------------------------------
 
     /**
      * Returns true if this Lifeform has specified Trait.

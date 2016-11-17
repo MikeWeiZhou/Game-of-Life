@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
  * @version 2016-11-13
  * @since   2016-11-10
  */
-public class TurnListener extends MouseAdapter{
+public class TurnListener extends MouseAdapter {
 
     private static final TimeUnit TIME_UNIT;
     private static final int      INIT_DELAY;

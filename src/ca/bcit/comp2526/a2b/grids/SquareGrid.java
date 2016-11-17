@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class SquareGrid extends Grid {
 
-    private final static int BORDER_SIZE = 0;
+    private static final int BORDER_SIZE = 0;
 
     /**
      * Constructs a Grid with the specified row and column.
@@ -68,22 +68,22 @@ public class SquareGrid extends Grid {
         }
 
         /* ADDS ONLY THE SPECIFIED LEVEL NEIGHBORS, NOT CUMULATIVE */
-//        // Add top and bottom rows of neighboring Nodes
-//        for (int row = cRow - lvl; row <= cRow + lvl; row += 2 * lvl) {
-//            for (int col = cCol - lvl; col <= cCol + lvl; col++) {
-//                if (inBounds(row, col)) {
-//                    neighbors.add(getNodeAt(row, col));
-//                }
-//            }
-//        }
-//        // Add remaining side columns of neighboring Nodes
-//        for (int row = cRow - lvl + 1; row <= cRow + lvl - 1; row++) {
-//            for (int col = cCol - lvl; col <= cCol + lvl; col += 2 * lvl) {
-//                if (inBounds(row, col)) {
-//                    neighbors.add(getNodeAt(row, col));
-//                }
-//            }
-//        }
+        // Add top and bottom rows of neighboring Nodes
+        //for (int row = cRow - lvl; row <= cRow + lvl; row += 2 * lvl) {
+        //    for (int col = cCol - lvl; col <= cCol + lvl; col++) {
+        //        if (inBounds(row, col)) {
+        //            neighbors.add(getNodeAt(row, col));
+        //        }
+        //    }
+        //}
+        //// Add remaining side columns of neighboring Nodes
+        //for (int row = cRow - lvl + 1; row <= cRow + lvl - 1; row++) {
+        //    for (int col = cCol - lvl; col <= cCol + lvl; col += 2 * lvl) {
+        //        if (inBounds(row, col)) {
+        //            neighbors.add(getNodeAt(row, col));
+        //        }
+        //    }
+        //}
 
         return neighbors.toArray(new Node[neighbors.size()]);
     }

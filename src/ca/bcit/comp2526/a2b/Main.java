@@ -11,7 +11,7 @@ import javax.swing.JFrame;
  */
 public final class Main extends JFrame {
 
-    private static final String TITLE= "Game of Life";
+    private static final String TITLE = "Game of Life";
 
     /*
      * Constructs a new Main.
