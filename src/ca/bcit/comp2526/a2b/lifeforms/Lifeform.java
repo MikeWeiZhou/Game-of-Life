@@ -9,18 +9,19 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 /**
  * Lifeform.
  *
  * @author  Wei Zhou
- * @version 2016-11-16
+ * @version 2016-11-17
  * @since   2016-11-06
  */
 public abstract class Lifeform {
 
-    private static final Terrain FOUNTAIN_OF_YOUTH = Terrain.WATER;
+    public static final Terrain FOUNTAIN_OF_YOUTH = Terrain.WATER;
 
     // mandatory settings to set
     private final World        world;
@@ -63,11 +64,18 @@ public abstract class Lifeform {
      * Initializes Lifeform. Throws an error if Lifeform is in an illegal state.
      */
     public void init() {
-        if (getDefaultColor() == null  || getMaxHealth() == 0    || getMortalityRate() == 0
-             || getColor() == null     || getHealth() == 0       || getMovement() == 0
-             || repNeighborsAlike == 0 || repNeighborsEmpty == 0 || repMaxBabies == 0) {
-
-            throw new IllegalStateException();
+        if (getDefaultColor() == null || getColor() == null) {
+            throw new IllegalStateException("Failed to initialize Lifeform: color or default "
+                    + "color not set");
+        } else if (getMaxHealth() == 0 || getHealth() == 0) {
+            throw new IllegalStateException("Failed to initialize Lifeform: health or max health "
+                    + "not set");
+        } else if (getMortalityRate() == 0) {
+            throw new IllegalStateException("Failed to initialize Lifeform: mortality rate must "
+                    + "be greater than 0");
+        } else if (repNeighborsAlike == 0 || repNeighborsEmpty == 0 || repMaxBabies == 0) {
+            throw new IllegalStateException("Failed to initialize Lifeform: reproduction settings"
+                    + " not set");
         }
 
         getLocation().setInhabitant(this);
@@ -87,7 +95,7 @@ public abstract class Lifeform {
      */
     public Lifeform[] reproduce() {
         final List<Node> emptyNodes = new ArrayList<Node>();
-        final Node[]     nearby     = getLocation().getNeighborsFor(this);
+        final Node[]     nearby     = getLocation().getImmediateNeighbors();
 
         int partnersNearby = 0;
         int emptyNearby    = 0;
@@ -95,7 +103,7 @@ public abstract class Lifeform {
 
         // determine conditions
         for (Node n : nearby) {
-            Lifeform lf = getWorld().getLifeformAt(n);
+            Lifeform lf = n.getInhabitant();
 
             if (lf == null) {
                 emptyNearby++;
@@ -113,7 +121,7 @@ public abstract class Lifeform {
                 && emptyNearby >= repNeighborsEmpty
                 && foodNearby >= repNeighborsFood) {
 
-            final int numOfBabies = getWorld().getRandom().nextInt(repMaxBabies) + 1;
+            final int numOfBabies = getRandom().nextInt(repMaxBabies) + 1;
             return makeBabies(emptyNodes.iterator(), numOfBabies);
         }
 
@@ -130,9 +138,10 @@ public abstract class Lifeform {
 
     /**
      * Kills this Lifeform if health is down to zero, or cancer develops and it dies.
+     * If it survives, age its color too.
      */
     protected void age() {
-        final float rand = getWorld().getRandom().nextFloat();
+        final float rand = getRandom().nextFloat();
 
         if (!getLocation().getTerrain().equals(FOUNTAIN_OF_YOUTH)) {
             setHealth(getHealth() - 1);
@@ -150,9 +159,9 @@ public abstract class Lifeform {
      */
     protected void changeColor() {
         final float fraction = Math.min(1, (float) getHealth() / getMaxHealth());
-        final int r = (int) Math.round(Math.max(0, getDefaultColor().getRed() * fraction));
-        final int g = (int) Math.round(Math.max(0, getDefaultColor().getGreen() * fraction));
-        final int b = (int) Math.round(Math.max(0, getDefaultColor().getBlue() * fraction));
+        final int r = Math.round(Math.max(0, getDefaultColor().getRed() * fraction));
+        final int g = Math.round(Math.max(0, getDefaultColor().getGreen() * fraction));
+        final int b = Math.round(Math.max(0, getDefaultColor().getBlue() * fraction));
         setColor(new Color(r, g, b, getDefaultColor().getAlpha()));
     }
 
@@ -173,7 +182,7 @@ public abstract class Lifeform {
                 continue;
             }
 
-            lf = getWorld().getSpawn().spawnAt(location, getLifeformType());
+            lf = reproduceAt(location);
             if (lf != null) {
                 newborns.add(lf);
             }
@@ -183,6 +192,15 @@ public abstract class Lifeform {
         }
 
         return newborns.toArray(new Lifeform[newborns.size()]);
+    }
+
+    /**
+     * Reproduce Lifeform at the selected location.
+     * @param location    Node
+     * @return offspring Lifeform, or null
+     */
+    protected Lifeform reproduceAt(final Node location) {
+        return world.getSpawn().spawnAt(location, getLifeformType());
     }
 
     // ----------------------------------------- SETTERS -------------------------------------------
@@ -201,14 +219,6 @@ public abstract class Lifeform {
      */
     protected void addTrait(final Trait trait) {
         traits.add(trait);
-    }
-
-    /**
-     * Removes Trait from this Lifeform.
-     * @param trait    to remove
-     */
-    protected void removeTrait(final Trait trait) {
-        traits.remove(trait);
     }
 
     /**
@@ -297,6 +307,14 @@ public abstract class Lifeform {
     // ------------------------------------------ GETTERS ------------------------------------------
 
     /**
+     * Return the World Random.
+     * @return Random
+     */
+    public Random getRandom() {
+        return world.getRandom();
+    }
+
+    /**
      * Returns true if this Lifeform has specified Trait.
      * @param trait    to check
      * @return true if Trait exists
@@ -311,14 +329,6 @@ public abstract class Lifeform {
      */
     public boolean isAlive() {
         return alive;
-    }
-
-    /**
-     * Returns the World that this Lifeform is in.
-     * @return World
-     */
-    public World getWorld() {
-        return world;
     }
 
     /**

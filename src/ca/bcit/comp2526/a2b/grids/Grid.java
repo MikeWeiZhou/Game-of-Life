@@ -13,7 +13,7 @@ import java.awt.Dimension;
  * Grid.
  *
  * @author  Wei Zhou
- * @version 2016-11-16
+ * @version 2016-11-17
  * @since   2016-11-06
  */
 public abstract class Grid {
@@ -80,6 +80,7 @@ public abstract class Grid {
      * @param node    to set neighbors for
      */
     private void setAllLevelNeighborsFor(final Node node) {
+        node.setNeighborsForLevel(0, new Node[0]);
         for (int lvl = 1; lvl <= NEIGHBOR_LEVELS; lvl++) {
             node.setNeighborsForLevel(lvl, calcNeighborsForLevel(lvl, node));
         }

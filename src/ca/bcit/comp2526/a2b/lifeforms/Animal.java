@@ -2,16 +2,17 @@ package ca.bcit.comp2526.a2b.lifeforms;
 
 import ca.bcit.comp2526.a2b.World;
 import ca.bcit.comp2526.a2b.grids.Node;
-import ca.bcit.comp2526.a2b.grids.Terrain;
 
 /**
  * Animal.
  *
  * @author  Wei Zhou
- * @version 2016-11-16
+ * @version 2016-11-17
  * @since   2016-11-08
  */
 public abstract class Animal extends Lifeform {
+
+    private Node targetNode;
 
     /**
      * Constructs a new Animal.
@@ -28,69 +29,82 @@ public abstract class Animal extends Lifeform {
      */
     @Override
     public void init() {
-        if (getMovement() == 0 || getTargetTrait() == null) {
-            throw new IllegalStateException();
+        if (getTargetTrait() == null) {
+            throw new IllegalStateException("Failed to initialize Animal: must have a target "
+                    + "Trait");
+        } else if (getMovement() == 0) {
+            throw new IllegalStateException("Failed to initialize Animal: movement must be "
+                    + "greater than 0");
         }
 
         super.init();
     }
+
+    // ----------------------------------------- TAKE ACTION ---------------------------------------
 
     /**
      * Take action.
      */
     @Override
     public void takeAction() {
-        Node target;
-
-        target = findTarget();
-        eatAt(target);
-        moveTo(target);
+        findTarget();
+        eat();
+        move();
 
         super.takeAction();
     }
 
     /**
-     * Finds and returns a suitable target Node to eatAt and/or move.
-     * @return a suitable target Node to eatAt/move
+     * Finds and sets a suitable target Node that may contain food.
      */
-    protected Node findTarget() {
-        final Node[] neighbors = getLocation().getNeighborsFor(this);
+    protected void findTarget() {
+        final Node[] neighbors = getLocation().getNeighborsWithinWalkingDistanceFor(this);
         Node target = null;
 
         shuffleNodes(neighbors);
 
         for (Node n : neighbors) {
-            if (n.getTerrain() == getInhabitable()) {
+            if (n.getTerrain().equals(getInhabitable())) {
                 continue;
             }
 
-            Lifeform lf = getWorld().getLifeformAt(n);
-
-            if (lf == null) {
+            if (n.getInhabitant() == null) {
                 if (target == null) {
                     target = n;
-                } else if (n.getTerrain().equals(Terrain.WATER)) {
+                } else if (n.getTerrain().equals(FOUNTAIN_OF_YOUTH)) {
                     target = n;
                 }
-            } else if (lf.hasTrait(getTargetTrait())) {
+            } else if (n.getInhabitant().hasTrait(getTargetTrait())) {
                 target = n;
                 break;
             }
         }
 
-        return target;
+        setTargetNode(target);
+    }
+
+    /*
+     * Shuffles the order of an array of Nodes.
+     * @param nodes    to shuffle
+     */
+    private void shuffleNodes(final Node[] nodes) {
+        for (int i = 1; i < nodes.length / 2; i++) {
+            int rand    = getRandom().nextInt(nodes.length);
+            Node tmp    = nodes[i];
+            nodes[i]    = nodes[rand];
+            nodes[rand] = tmp;
+        }
     }
 
     /**
      * Eats Lifeform at target Node, if edible.
-     * @param target    Node
      */
-    protected void eatAt(final Node target) {
-        if (target == null) {
+    protected void eat() {
+        if (getTargetNode() == null) {
             return;
         }
 
-        final Lifeform lf = getWorld().getLifeformAt(target);
+        final Lifeform lf = getTargetNode().getInhabitant();
         if (lf != null && lf.hasTrait(getTargetTrait())) {
             lf.kill();
 
@@ -102,26 +116,32 @@ public abstract class Animal extends Lifeform {
 
     /**
      * Move to target Node if not null.
-     * @param target    Node
      */
-    protected void moveTo(final Node target) {
-        if (target == null) {
+    protected void move() {
+        if (getTargetNode() == null) {
             return;
         }
 
-        setLocation(target);
+        setLocation(getTargetNode());
     }
 
-    /*
-     * Shuffles the order of an array of Nodes.
-     * @param nodes    to shuffle
+    // ----------------------------------------- SETTERS -------------------------------------------
+
+    /**
+     * Sets the target Node.
+     * @param target    Node
      */
-    private void shuffleNodes(final Node[] nodes) {
-        for (int i = 1; i < nodes.length / 2; i++) {
-            int rand    = getWorld().getRandom().nextInt(nodes.length);
-            Node tmp    = nodes[i];
-            nodes[i]    = nodes[rand];
-            nodes[rand] = tmp;
-        }
+    protected void setTargetNode(final Node target) {
+        targetNode = target;
+    }
+
+    // ----------------------------------------- GETTERS -------------------------------------------
+
+    /**
+     * Returns target Node.
+     * @return target Node
+     */
+    protected Node getTargetNode() {
+        return targetNode;
     }
 }

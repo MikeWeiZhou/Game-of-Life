@@ -10,7 +10,6 @@ import ca.bcit.comp2526.a2b.lifeforms.LifeformType;
 import ca.bcit.comp2526.a2b.lifeforms.Omnivore;
 import ca.bcit.comp2526.a2b.lifeforms.Plant;
 
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -22,7 +21,7 @@ import java.util.TreeMap;
  * Spawn.
  *
  * @author  Wei Zhou
- * @version 2016-11-16
+ * @version 2016-11-17
  * @since   2016-11-06
  */
 public abstract class Spawn {
@@ -66,10 +65,18 @@ public abstract class Spawn {
      * Throws an error if Spawn in an illegal state. Then finalizes spawn rates.
      */
     public void init() {
-        if (spawnRate.size() != mortalityRates.size() || terraformIndex != 1f) {
-            throw new IllegalStateException();
+        if (spawnRate.size() != mortalityRates.size()) {
+            throw new IllegalStateException("Failed to initialize Spawn: # of spawn rate "
+                    + "lifeforms must equal to # of mortality rates");
+        } else if (terraformIndex != 1.0f) {
+            throw new IllegalStateException("Failed to initialize Spawn: terrain distribution "
+                    + "does not equate to 100%");
+        } else if (convergingRate > 0 && convergingTerrain == null) {
+            throw new IllegalStateException("Failed to initialize Spawn: converging Terrain not "
+                    + "set");
         }
 
+        // prevents further addition of spawn rates
         addSpawnRate(null, 1.0f);
     }
 
@@ -125,6 +132,10 @@ public abstract class Spawn {
      * @param location    Node
      */
     public void terraformAt(final Node location) {
+        if (location == null) {
+            return;
+        }
+
         Terrain terrain   = terraformRate.get(terraformRate.lowerKey(random.nextFloat()));
         Node[]  neighbors = location.getImmediateNeighbors();
 
@@ -155,6 +166,10 @@ public abstract class Spawn {
      * @return Lifeform or null
      */
     public Lifeform spawnAt(final Node node) {
+        if (node == null) {
+            return null;
+        }
+
         final float        randomKey;
         final LifeformType lft;
 
@@ -179,7 +194,6 @@ public abstract class Spawn {
             final Constructor constructor = CLASSES.get(lft)
                     .getConstructor(Node.class, World.class);
             final Lifeform lf = (Lifeform) constructor.newInstance(node, world);
-
 
             if (!terrain.equals(unspawnableTerrain) && !terrain.equals(lf.getInhabitable())) {
                 lf.setMortalityRate(mortalityRates.get(lft));

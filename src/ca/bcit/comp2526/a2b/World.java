@@ -3,7 +3,6 @@ package ca.bcit.comp2526.a2b;
 import ca.bcit.comp2526.a2b.grids.Grid;
 import ca.bcit.comp2526.a2b.grids.Node;
 import ca.bcit.comp2526.a2b.grids.SquareGrid;
-import ca.bcit.comp2526.a2b.grids.Terrain;
 import ca.bcit.comp2526.a2b.lifeforms.Lifeform;
 import ca.bcit.comp2526.a2b.renderers.Renderer;
 import ca.bcit.comp2526.a2b.renderers.SquareRenderer;
@@ -23,12 +22,10 @@ import javax.swing.JFrame;
  * World.
  *
  * @author  Wei Zhou
- * @version 2016-11-16
+ * @version 2016-11-17
  * @since   2016-11-06
  */
 public class World {
-
-    private static final Terrain WATER = Terrain.WATER;
 
     private final Random         random;
     private final List<Lifeform> lifeforms;
@@ -67,11 +64,11 @@ public class World {
      * Takes a turn.
      */
     public void takeTurn() {
-//        long t1 = 0;
-//        long t2;
-//        if (++turnsTimed < 100) {
-//            t1 = new Date().getTime();
-//        }
+        long t1 = 0;
+        long t2;
+        if (++turnsTimed < 250) {
+            t1 = new Date().getTime();
+        }
 
         // all living Lifeforms take action
         ListIterator<Lifeform> it = lifeforms.listIterator();
@@ -83,8 +80,8 @@ public class World {
 
             lf.takeAction();
             Lifeform[] newborns = lf.reproduce();
-            for (int i = 0; i < newborns.length; i++) {
-                it.add(newborns[i]);
+            for (Lifeform newborn : newborns) {
+                it.add(newborn);
             }
         }
 
@@ -92,18 +89,18 @@ public class World {
         Collections.shuffle(lifeforms);
         renderer.update();
 
-//        if (turnsTimed < 100) {
-//            t2 = new Date().getTime();
-//            long avg = t2 - t1;
-//            timer.add(avg);
-//        } else {
-//            long sum = 0;
-//            for (long time : timer) {
-//                sum += time;
-//            }
-//            long avg = sum / timer.size();
-//            System.out.println("Average time per turn: " + avg);
-//        }
+        if (turnsTimed < 250) {
+            t2 = new Date().getTime();
+            long avg = t2 - t1;
+            timer.add(avg);
+        } else if (turnsTimed == 250) {
+            long sum = 0;
+            for (long time : timer) {
+                sum += time;
+            }
+            long avg = sum / timer.size();
+            System.out.println("Average time per turn: " + avg);
+        }
     }
 
     /*
@@ -169,15 +166,5 @@ public class World {
      */
     public Lifeform[] getLifeforms() {
         return lifeforms.toArray(new Lifeform[lifeforms.size()]);
-    }
-
-    /**
-     * Returns the Lifeform at the specified row and column, or null.
-     * @param node    to check
-     * @return Lifeform or null
-     */
-    public Lifeform getLifeformAt(final Node node) {
-        final Lifeform lf = node.getInhabitant();
-        return (lf != null && lf.isAlive()) ? lf : null;
     }
 }

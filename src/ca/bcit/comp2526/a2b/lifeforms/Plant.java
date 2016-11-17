@@ -10,7 +10,7 @@ import java.awt.Color;
  * Plant.
  *
  * @author  Wei Zhou
- * @version 2016-11-15
+ * @version 2016-11-17
  * @since   2016-11-07
  */
 public class Plant extends Lifeform {
@@ -18,7 +18,6 @@ public class Plant extends Lifeform {
     private static final LifeformType TYPE;
     private static final Color        COLOR;
     private static final int          HEALTH;
-    private static final int          MOVEMENT;
     private static final Terrain      INHABITABLE;
 
     private static final int          R_PARTNERS;
@@ -30,7 +29,6 @@ public class Plant extends Lifeform {
         TYPE        = LifeformType.PLANT;
         COLOR       = Color.green;
         HEALTH      = 10;
-        MOVEMENT    = 1;
         INHABITABLE = Terrain.WATER;
 
         R_PARTNERS   = 3;
@@ -50,7 +48,6 @@ public class Plant extends Lifeform {
         setDefaultColor(COLOR);
         setHealth(HEALTH);
         setMaxHealth(HEALTH);
-        setMovement(MOVEMENT);
         setSexConditions(R_PARTNERS, R_EMPTY, R_MAX_BABIES, R_FOOD);
         setInhabitable(INHABITABLE);
 

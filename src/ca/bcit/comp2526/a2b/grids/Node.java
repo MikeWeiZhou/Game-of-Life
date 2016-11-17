@@ -11,7 +11,7 @@ import java.util.Map;
  * Node.
  *
  * @author  Wei Zhou
- * @version 2016-11-16
+ * @version 2016-11-17
  * @since   2016-11-06
  */
 public class Node {
@@ -84,7 +84,7 @@ public class Node {
      * @param lf    Lifeform that is looking around
      * @return neighboring Nodes
      */
-    public Node[] getNeighborsFor(final Lifeform lf) {
+    public Node[] getNeighborsWithinWalkingDistanceFor(final Lifeform lf) {
         return neighbors.get(lf.getMovement());
     }
 
@@ -101,7 +101,7 @@ public class Node {
      * @return Lifeform
      */
     public Lifeform getInhabitant() {
-        return inhabitant;
+        return (inhabitant != null && inhabitant.isAlive()) ? inhabitant : null;
     }
 
     /**
