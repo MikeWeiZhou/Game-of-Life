@@ -42,7 +42,7 @@ public class World {
     public World(final JFrame frame) {
         random    = new Random();
         lifeforms = new ArrayList<Lifeform>();
-        grid      = new SquareGrid(160, 80, 5);
+        grid      = new SquareGrid(160, 80, 6);
         spawn     = new NaturalSpawn(this);
         renderer  = new SquareRenderer(frame, this);
 
@@ -99,7 +99,9 @@ public class World {
                 sum += time;
             }
             long avg = sum / timer.size();
-            System.out.println("Average time per turn: " + avg);
+            System.out.println("Average time per turn calculations: " + avg + " ms");
+            turnsTimed = 0;
+            timer.clear();
         }
     }
 
