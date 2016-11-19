@@ -1,5 +1,6 @@
 package ca.bcit.comp2526.a2b.spawns;
 
+import ca.bcit.comp2526.a2b.Factory;
 import ca.bcit.comp2526.a2b.World;
 import ca.bcit.comp2526.a2b.grids.Node;
 import ca.bcit.comp2526.a2b.grids.Terrain;
@@ -10,8 +11,6 @@ import ca.bcit.comp2526.a2b.lifeforms.LifeformType;
 import ca.bcit.comp2526.a2b.lifeforms.Omnivore;
 import ca.bcit.comp2526.a2b.lifeforms.Plant;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -38,15 +37,22 @@ public abstract class Spawn {
 
     private final World                        world;
     private final Random                       random;
-    private final TreeMap<Float, Terrain>      terraformRate;
+
+    // Lifeforms
     private final TreeMap<Float, LifeformType> spawnRate;
-    private final Map<LifeformType, Float>     mortalityRates;
-    private       float                        terraformIndex;
     private       float                        spawnIndex;
+    private final Map<LifeformType, Float>     mortalityRates;
+
+    // Terrains
+    private final TreeMap<Float, Terrain>      terraformRate;
+    private       float                        terraformIndex;
     private       Terrain                      unspawnableTerrain;
     private       Terrain                      convergingTerrain;
     private       float                        convergingRate;
+
+    // Misc
     private       Lifeform                     newborn;
+    private       boolean                      variablesLocked;
 
     /**
      * Constructs a Spawn.
@@ -55,30 +61,44 @@ public abstract class Spawn {
     public Spawn(final World world) {
         this.world     = world;
         random         = world.getRandom();
-        terraformRate  = new TreeMap<Float, Terrain>();
+
         spawnRate      = new TreeMap<Float, LifeformType>();
-        mortalityRates = new HashMap<LifeformType, Float>();
-        terraformIndex = 0f;
         spawnIndex     = 0f;
+        mortalityRates = new HashMap<LifeformType, Float>();
+
+        terraformRate  = new TreeMap<Float, Terrain>();
+        terraformIndex = 0f;
+
+        variablesLocked = false;
     }
 
     /**
-     * Throws an error if Spawn in an illegal state. Then finalizes spawn rates.
+     * Throws an error if Spawn in an illegal state. Then disables modifications to variables.
      */
     public void init() {
         if (spawnRate.size() != mortalityRates.size()) {
             throw new IllegalStateException("Failed to initialize Spawn: # of spawn rate "
                     + "lifeforms must equal to # of mortality rates");
-        } else if (terraformIndex != 1.0f) {
+        }
+        if (spawnIndex == 0) {
+            throw new IllegalStateException("Failed to initialize Spawn: no Lifeform spawn rates "
+                    + "added");
+        }
+        if (spawnIndex > 1.0f) {
+            throw new IllegalStateException("Failed to initialize Spawn: spawn rates cannot sum "
+                    + "up to over 100%");
+        }
+        if (terraformIndex != 1.0f) {
             throw new IllegalStateException("Failed to initialize Spawn: terrain distribution "
                     + "does not equate to 100%");
-        } else if (convergingRate > 0 && convergingTerrain == null) {
+        }
+        if (convergingRate > 0 && convergingTerrain == null) {
             throw new IllegalStateException("Failed to initialize Spawn: converging Terrain not "
                     + "set");
         }
 
-        // prevents further addition of spawn rates
-        addSpawnRate(null, 1.0f);
+        addSpawnRate(null, 1.0f); // fill in spawn rates in case they don't sum up to 100%
+        variablesLocked = true;
     }
 
     // ------------------------------- TERRAFORMING & SPAWNING -------------------------------------
@@ -145,30 +165,16 @@ public abstract class Spawn {
             return false;
         }
 
-        try {
-            final Terrain terrain = node.getTerrain();
-            final Constructor constructor = CLASSES.get(lft)
-                    .getConstructor(Node.class, World.class);
-            final Lifeform lf = (Lifeform) constructor.newInstance(node, world);
+        final Terrain    terrain    = node.getTerrain();
+        final Class<?>[] paramTypes = {Node.class, World.class};
+        final Object[]   paramVals  = {node, world};
+        final Lifeform   lf         = Factory.createObject(CLASSES.get(lft), paramTypes, paramVals);
 
-            if (!terrain.equals(unspawnableTerrain) && !terrain.equals(lf.getInhabitable())) {
-                lf.setMortalityRate(mortalityRates.get(lft));
-                lf.init();
-                setNewborn(lf);
-                return true;
-            }
-        } catch (final InstantiationException ex) {
-            System.err.println("Error creating: " + lft);
-            System.exit(1);
-        } catch (final IllegalAccessException ex) {
-            System.err.println(lft + " must have a public constructor");
-            System.exit(1);
-        } catch (final NoSuchMethodException ex) {
-            System.err.println("No such constructor in creating: " + lft);
-            System.exit(1);
-        } catch (final InvocationTargetException ex) {
-            System.err.println("Error in invoking class: " + lft);
-            System.exit(1);
+        if (!terrain.equals(unspawnableTerrain) && !terrain.equals(lf.getInhabitable())) {
+            lf.setMortalityRate(mortalityRates.get(lft));
+            lf.init();
+            setNewborn(lf);
+            return true;
         }
 
         return false;
@@ -200,6 +206,10 @@ public abstract class Spawn {
      * @param probability    of a Node being the specified Terrain type
      */
     protected void addTerraformRate(final Terrain terrain, final float probability) {
+        if (variablesLocked) {
+            return;
+        }
+
         terraformRate.put(terraformIndex, terrain);
         terraformIndex += probability;
     }
@@ -210,6 +220,10 @@ public abstract class Spawn {
      * @param probability    of spawning
      */
     protected void addSpawnRate(final LifeformType lft, final float probability) {
+        if (variablesLocked) {
+            return;
+        }
+
         spawnRate.put(spawnIndex, lft);
         spawnIndex += probability;
     }
@@ -220,6 +234,10 @@ public abstract class Spawn {
      * @param rate    mortality rate
      */
     protected void addMortalityRate(final LifeformType lft, final float rate) {
+        if (variablesLocked) {
+            return;
+        }
+
         mortalityRates.put(lft, rate);
     }
 
@@ -228,6 +246,10 @@ public abstract class Spawn {
      * @param terrain    that cannot give birth to anything
      */
     protected void setUnspawnableTerrain(final Terrain terrain) {
+        if (variablesLocked) {
+            return;
+        }
+
         unspawnableTerrain = terrain;
     }
 
@@ -237,6 +259,10 @@ public abstract class Spawn {
      * @param rate       that Water Terrain converges at
      */
     protected void setConvergingTerrain(final Terrain terrain, final float rate) {
+        if (variablesLocked) {
+            return;
+        }
+
         convergingTerrain = terrain;
         convergingRate    = rate;
     }

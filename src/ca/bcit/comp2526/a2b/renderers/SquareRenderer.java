@@ -9,13 +9,12 @@ import ca.bcit.comp2526.a2b.lifeforms.LifeformType;
 import java.awt.Graphics2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
-import javax.swing.JFrame;
 
 /**
  * SquareRenderer.
  *
  * @author  Wei Zhou
- * @version 2016-11-18
+ * @version 2016-11-19
  * @since   2016-11-06
  */
 public class SquareRenderer extends Renderer {
@@ -28,11 +27,10 @@ public class SquareRenderer extends Renderer {
 
     /**
      * Constructs a new SquareRenderer.
-     * @param frame    window to render GUI
      * @param world    to render
      */
-    public SquareRenderer(final JFrame frame, final World world) {
-        super(frame, world);
+    public SquareRenderer(final World world) {
+        super(world);
     }
 
     /**

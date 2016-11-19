@@ -78,7 +78,7 @@ public abstract class Lifeform {
         }
         if (repNeighborsAlike == 0 || repNeighborsEmpty == 0 || repMaxBabies == 0) {
             throw new IllegalStateException("Failed to initialize Lifeform: reproduction settings"
-                    + " not set");
+                    + " not valid");
         }
 
         getLocation().setInhabitant(this);
@@ -146,13 +146,14 @@ public abstract class Lifeform {
      * If it survives, age its color too.
      */
     protected void age() {
-        final float rand = getRandom().nextFloat();
+        final float   rand       = getRandom().nextFloat();
+        final boolean mortalized = 0 <= rand && rand <= getMortalityRate();
 
         if (!getLocation().getTerrain().equals(FOUNTAIN_OF_YOUTH)) {
             setHealth(getHealth() - 1);
         }
 
-        if (getHealth() <= 0 || (0 <= rand && rand <= getMortalityRate())) {
+        if (getHealth() <= 0 || mortalized) {
             kill();
         } else {
             changeColor();

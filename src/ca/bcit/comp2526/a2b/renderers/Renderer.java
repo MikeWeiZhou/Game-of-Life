@@ -4,21 +4,19 @@ import ca.bcit.comp2526.a2b.World;
 import ca.bcit.comp2526.a2b.grids.Grid;
 import ca.bcit.comp2526.a2b.lifeforms.Lifeform;
 
-
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 /**
  * Renderer.
  *
  * @author  Wei Zhou
- * @version 2016-11-10
+ * @version 2016-11-19
  * @since   2016-11-06
  */
 public abstract class Renderer extends JPanel {
@@ -29,16 +27,13 @@ public abstract class Renderer extends JPanel {
         TOOLKIT = Toolkit.getDefaultToolkit();
     }
 
-    private final JFrame frame;
-    private final World  world;
+    private final World world;
 
     /**
      * Constructor.
-     * @param frame    window to render GUI
      * @param world    to render
      */
-    public Renderer(final JFrame frame, final World world) {
-        this.frame = frame;
+    public Renderer(final World world) {
         this.world = world;
     }
 
@@ -47,9 +42,11 @@ public abstract class Renderer extends JPanel {
      */
     public void init() {
         setPreferredSize(world.getGrid().getSize());
-        frame.add(this);
-        frame.setLocation(centerOnScreen(world.getGrid().getSize()));
+        world.getFrame().add(this);
+        world.getFrame().setLocation(centerOnScreen(world.getGrid().getSize()));
     }
+
+    // ------------------------------------------- DRAW --------------------------------------------
 
     /**
      * Updates GUI.
@@ -68,6 +65,8 @@ public abstract class Renderer extends JPanel {
         drawWorld(g2, world.getGrid(), world.getLifeforms());
     }
 
+    // ------------------------------------------ ABSTRACTS ----------------------------------------
+
     /**
      * Draws Lifeforms.
      * @param g2           Graphics2D object to draw on
@@ -75,6 +74,8 @@ public abstract class Renderer extends JPanel {
      * @param lifeforms    to draw
      */
     public abstract void drawWorld(Graphics2D g2, Grid grid, Lifeform[] lifeforms);
+
+    // ----------------------------------------- OPTIONS -------------------------------------------
 
     /**
      * Returns the centre point of the screen.

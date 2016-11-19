@@ -1,13 +1,12 @@
 package ca.bcit.comp2526.a2b;
 
 import ca.bcit.comp2526.a2b.grids.Grid;
+import ca.bcit.comp2526.a2b.grids.GridType;
 import ca.bcit.comp2526.a2b.grids.Node;
-import ca.bcit.comp2526.a2b.grids.SquareGrid;
 import ca.bcit.comp2526.a2b.lifeforms.Lifeform;
 import ca.bcit.comp2526.a2b.renderers.Renderer;
-import ca.bcit.comp2526.a2b.renderers.SquareRenderer;
-import ca.bcit.comp2526.a2b.spawns.NaturalSpawn;
 import ca.bcit.comp2526.a2b.spawns.Spawn;
+import ca.bcit.comp2526.a2b.spawns.SpawnType;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,6 +26,17 @@ import javax.swing.JFrame;
  */
 public class World {
 
+    private static final int ROWS;
+    private static final int COLS;
+    private static final int NODE_LENGTH;
+
+    static {
+        ROWS        = 160;
+        COLS        = 80;
+        NODE_LENGTH = 6;
+    }
+
+    private final JFrame         frame;
     private final Random         random;
     private final List<Lifeform> lifeforms;
     private final Grid           grid;
@@ -38,13 +48,17 @@ public class World {
 
     /**
      * Constructor.
+     * @param gameFrame    game frame to draw on
+     * @param gridType     type of grid
+     * @param spawnType    type of spawn
      */
-    public World(final JFrame frame) {
+    public World(final JFrame gameFrame, final GridType gridType, final SpawnType spawnType) {
+        frame     = gameFrame;
         random    = new Random();
         lifeforms = new ArrayList<Lifeform>();
-        grid      = new SquareGrid(160, 80, 6);
-        spawn     = new NaturalSpawn(this);
-        renderer  = new SquareRenderer(frame, this);
+        grid      = Factory.createGrid(gridType, ROWS, COLS, NODE_LENGTH);
+        spawn     = Factory.createSpawn(spawnType, this);
+        renderer  = Factory.createRenderer(gridType, this);
 
         timer      = new ArrayList<Long>();
         turnsTimed = 0;
@@ -54,10 +68,14 @@ public class World {
      * Initializes this World.
      */
     public void init() {
+        if (frame == null) {
+            throw new IllegalStateException("World: must have a valid game frame.");
+        }
+
         grid.init();
         spawn.init();
-        createWorld();   // must be initiated right before renderer.int()
-        renderer.init(); // must be initiated last
+        createWorld();   // must be initiated after grid and spawn
+        renderer.init(); // must be initiated after createWorld()
     }
 
     /*
@@ -145,6 +163,14 @@ public class World {
      */
     public Random getRandom() {
         return random;
+    }
+
+    /**
+     * Returns the game frame of this World.
+     * @return game frame as JFrame
+     */
+    public JFrame getFrame() {
+        return frame;
     }
 
     /**
