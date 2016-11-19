@@ -7,7 +7,7 @@ import ca.bcit.comp2526.a2b.grids.Node;
  * Animal.
  *
  * @author  Wei Zhou
- * @version 2016-11-17
+ * @version 2016-11-18
  * @since   2016-11-08
  */
 public abstract class Animal extends Lifeform {
@@ -32,7 +32,8 @@ public abstract class Animal extends Lifeform {
         if (getTargetTrait() == null) {
             throw new IllegalStateException("Failed to initialize Animal: must have a target "
                     + "Trait");
-        } else if (getMovement() == 0) {
+        }
+        if (getMovement() == 0) {
             throw new IllegalStateException("Failed to initialize Animal: movement must be "
                     + "greater than 0");
         }
@@ -68,7 +69,7 @@ public abstract class Animal extends Lifeform {
                 continue;
             }
 
-            if (n.getInhabitant() == null) {
+            if (!n.hasLivingInhabitant()) {
                 if (target == null) {
                     target = n;
                 } else if (n.getTerrain().equals(FOUNTAIN_OF_YOUTH)) {
@@ -100,12 +101,12 @@ public abstract class Animal extends Lifeform {
      * Eats Lifeform at target Node, if edible.
      */
     protected void eat() {
-        if (getTargetNode() == null) {
+        if (getTargetNode() == null || !getTargetNode().hasLivingInhabitant()) {
             return;
         }
 
-        final Lifeform lf = getTargetNode().getInhabitant();
-        if (lf != null && lf.hasTrait(getTargetTrait())) {
+        Lifeform lf = getTargetNode().getInhabitant();
+        if (lf.hasTrait(getTargetTrait())) {
             lf.kill();
 
             // +1 due to age() being called after eating

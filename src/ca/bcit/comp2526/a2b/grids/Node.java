@@ -11,17 +11,17 @@ import java.util.Map;
  * Node.
  *
  * @author  Wei Zhou
- * @version 2016-11-17
+ * @version 2016-11-18
  * @since   2016-11-06
  */
 public class Node {
 
-    private static final Map<Terrain, Color> COLOR;
+    private static final Map<Terrain, Color> TERRAIN_COLOR;
 
     static {
-        COLOR = new HashMap<Terrain, Color>();
-        COLOR.put(Terrain.LAND,  Color.white);
-        COLOR.put(Terrain.WATER, Color.blue);
+        TERRAIN_COLOR = new HashMap<Terrain, Color>();
+        TERRAIN_COLOR.put(Terrain.LAND,  Color.white);
+        TERRAIN_COLOR.put(Terrain.WATER, Color.blue);
     }
 
     private final Map<Integer, Node[]> neighbors;
@@ -80,6 +80,14 @@ public class Node {
     // ------------------------------------------- GETTERS -----------------------------------------
 
     /**
+     * Returns true if Node has a living inhabitant.
+     * @return True if Lifeform inhabiting at this Node is alive
+     */
+    public boolean hasLivingInhabitant() {
+        return (inhabitant != null && inhabitant.isAlive());
+    }
+
+    /**
      * Returns neighboring Nodes.
      * @param lf    Lifeform that is looking around
      * @return neighboring Nodes
@@ -101,7 +109,7 @@ public class Node {
      * @return Lifeform
      */
     public Lifeform getInhabitant() {
-        return (inhabitant != null && inhabitant.isAlive()) ? inhabitant : null;
+        return inhabitant;
     }
 
     /**
@@ -114,10 +122,10 @@ public class Node {
 
     /**
      * Returns the Color of the Terrain.
-     * @return Color
+     * @return Terrain Color
      */
-    public Color getColor() {
-        return COLOR.get(terrain);
+    public Color getTerrainColor() {
+        return TERRAIN_COLOR.get(terrain);
     }
 
     /**

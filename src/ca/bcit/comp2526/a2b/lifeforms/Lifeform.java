@@ -16,7 +16,7 @@ import java.util.Set;
  * Lifeform.
  *
  * @author  Wei Zhou
- * @version 2016-11-17
+ * @version 2016-11-19
  * @since   2016-11-06
  */
 public abstract class Lifeform {
@@ -27,7 +27,7 @@ public abstract class Lifeform {
     private final World        world;
     private final Set<Trait>   traits;
     private final LifeformType type;
-    private       Node         node;
+    private       Node         location;
     private       boolean      alive;
     private       Color        color;
     private       Color        defaultColor;
@@ -48,16 +48,16 @@ public abstract class Lifeform {
 
     /**
      * Constructs a new Lifeform.
-     * @param lft     LifeformType
-     * @param node    that contains this Lifeform
-     * @param world   that contains this Lifeform
+     * @param lft         LifeformType
+     * @param location    that contains this Lifeform
+     * @param world       that contains this Lifeform
      */
-    public Lifeform(final LifeformType lft, final Node node, final World world) {
-        this.traits = new HashSet<Trait>();
-        this.type   = lft;
-        this.node   = node;
-        this.world  = world;
-        this.alive  = true;
+    public Lifeform(final LifeformType lft, final Node location, final World world) {
+        this.traits   = new HashSet<Trait>();
+        this.type     = lft;
+        this.location = location;
+        this.world    = world;
+        this.alive    = true;
     }
 
     /**
@@ -67,13 +67,16 @@ public abstract class Lifeform {
         if (getDefaultColor() == null || getColor() == null) {
             throw new IllegalStateException("Failed to initialize Lifeform: color or default "
                     + "color not set");
-        } else if (getMaxHealth() == 0 || getHealth() == 0) {
+        }
+        if (getMaxHealth() == 0 || getHealth() == 0) {
             throw new IllegalStateException("Failed to initialize Lifeform: health or max health "
                     + "not set");
-        } else if (getMortalityRate() == 0) {
+        }
+        if (getMortalityRate() == 0) {
             throw new IllegalStateException("Failed to initialize Lifeform: mortality rate must "
                     + "be greater than 0");
-        } else if (repNeighborsAlike == 0 || repNeighborsEmpty == 0 || repMaxBabies == 0) {
+        }
+        if (repNeighborsAlike == 0 || repNeighborsEmpty == 0 || repMaxBabies == 0) {
             throw new IllegalStateException("Failed to initialize Lifeform: reproduction settings"
                     + " not set");
         }
@@ -91,7 +94,8 @@ public abstract class Lifeform {
     }
 
     /**
-     * Reproduce if sex conditions met.
+     * Returns an array of new Lifeforms on successful reproduction, or an empty array.
+     * @return array of Lifeforms
      */
     public Lifeform[] reproduce() {
         final List<Node> emptyNodes = new ArrayList<Node>();
@@ -103,12 +107,13 @@ public abstract class Lifeform {
 
         // determine conditions
         for (Node n : nearby) {
-            Lifeform lf = n.getInhabitant();
 
-            if (lf == null) {
+            if (!n.hasLivingInhabitant()) {
                 emptyNearby++;
                 emptyNodes.add(n);
             } else {
+                Lifeform lf = n.getInhabitant();
+
                 if (lf.getLifeformType().equals(getLifeformType())) {
                     partnersNearby++;
                 } else if (lf.hasTrait(getTargetTrait())) {
@@ -167,27 +172,26 @@ public abstract class Lifeform {
 
     /**
      * Creates and returns an array of newborns for this Lifeform.
-     * @param empty        Iterator for empty Nodes where babies can live in
-     * @param maxBabies    to produce of this LifeformType
+     * @param emptyNodes        Iterator for empty Nodes where babies can live in
+     * @param maxBabies         to produce of this LifeformType
      * @return array of newborn Lifeforms
      */
-    protected Lifeform[] makeBabies(final Iterator<Node> empty, int maxBabies) {
+    protected Lifeform[] makeBabies(final Iterator<Node> emptyNodes, int maxBabies) {
         final List<Lifeform> newborns = new ArrayList<Lifeform>();
 
-        while (empty.hasNext() && maxBabies > 0) {
-            Node location = empty.next();
+        while (emptyNodes.hasNext() && maxBabies > 0) {
+            Node location = emptyNodes.next();
             Lifeform lf;
 
             if (location.getTerrain().equals(getInhabitable())) {
                 continue;
             }
 
-            lf = reproduceAt(location);
-            if (lf != null) {
-                newborns.add(lf);
+            if (reproduceAt(location)) {
+                newborns.add(getNewborn());
             }
 
-            empty.remove();
+            emptyNodes.remove();
             --maxBabies;
         }
 
@@ -195,12 +199,20 @@ public abstract class Lifeform {
     }
 
     /**
-     * Reproduce Lifeform at the selected location.
+     * Returns true if newborn successfully survives birth, false otherwise.
      * @param location    Node
-     * @return offspring Lifeform, or null
+     * @return Returns true if newborn survives birth
      */
-    protected Lifeform reproduceAt(final Node location) {
+    protected boolean reproduceAt(final Node location) {
         return world.getSpawn().spawnAt(location, getLifeformType());
+    }
+
+    /**
+     * Returns newborn Lifeform.
+     * @return newborn Lifeform
+     */
+    protected Lifeform getNewborn() {
+        return world.getSpawn().getNewborn();
     }
 
     // ----------------------------------------- SETTERS -------------------------------------------
@@ -265,13 +277,13 @@ public abstract class Lifeform {
      * @param newLocation    that Lifeform will move to
      */
     protected void setLocation(final Node newLocation) {
-        if (newLocation == node) {
+        if (newLocation == location) {
             return;
         }
 
-        node.removeInhabitant();
+        location.removeInhabitant();
         newLocation.setInhabitant(this);
-        node = newLocation;
+        location = newLocation;
     }
 
     /**
@@ -343,7 +355,7 @@ public abstract class Lifeform {
      * @return Node
      */
     public Node getLocation() {
-        return node;
+        return location;
     }
 
     /**

@@ -21,7 +21,7 @@ import java.util.TreeMap;
  * Spawn.
  *
  * @author  Wei Zhou
- * @version 2016-11-17
+ * @version 2016-11-19
  * @since   2016-11-06
  */
 public abstract class Spawn {
@@ -46,6 +46,7 @@ public abstract class Spawn {
     private       Terrain                      unspawnableTerrain;
     private       Terrain                      convergingTerrain;
     private       float                        convergingRate;
+    private       Lifeform                     newborn;
 
     /**
      * Constructs a Spawn.
@@ -80,52 +81,7 @@ public abstract class Spawn {
         addSpawnRate(null, 1.0f);
     }
 
-    /**
-     * Disallows spawning Lifeform on the specified Terrain.
-     * @param terrain    that cannot give birth to anything
-     */
-    protected void setUnspawnableTerrain(final Terrain terrain) {
-        unspawnableTerrain = terrain;
-    }
-
-    /**
-     * Sets the water convergence rate. (WARNING: exponential growth of Terrain.WATER once set)
-     * @param terrain    that Water Terrain converges at
-     * @param rate       that Water Terrain converges at
-     */
-    protected void setConvergingTerrain(final Terrain terrain, final float rate) {
-        convergingTerrain = terrain;
-        convergingRate    = rate;
-    }
-
-    /**
-     * Add the specified terrain terraform probability for the specified Terrain.
-     * @param terrain        type
-     * @param probability    of a Node being the specified Terrain type
-     */
-    protected void addTerraformRate(final Terrain terrain, final float probability) {
-        terraformRate.put(terraformIndex, terrain);
-        terraformIndex += probability;
-    }
-
-    /**
-     * Add the specified spawnAt probability for the specified Lifeform.
-     * @param lft            LifeformType
-     * @param probability    of spawning
-     */
-    protected void addSpawnRate(final LifeformType lft, final float probability) {
-        spawnRate.put(spawnIndex, lft);
-        spawnIndex += probability;
-    }
-
-    /**
-     * Adds mortalityRate to specified LifeformType.
-     * @param lft     LifeformType
-     * @param rate    mortality rate
-     */
-    protected void addMortalityRate(final LifeformType lft, final float rate) {
-        mortalityRates.put(lft, rate);
-    }
+    // ------------------------------- TERRAFORMING & SPAWNING -------------------------------------
 
     /**
      * Terraforms the specified Node into a random Terrain based on selected probabilities.
@@ -161,13 +117,13 @@ public abstract class Spawn {
     }
 
     /**
-     * Creates a Lifeform based on selected probabilities at the specified Node.
+     * Returns true if newborn successfully lives thru birth, false otherwise.
      * @param node    to spawnAt Lifeform in
-     * @return Lifeform or null
+     * @return true if Lifeform lived thru birth
      */
-    public Lifeform spawnAt(final Node node) {
+    public boolean spawnAt(final Node node) {
         if (node == null) {
-            return null;
+            return false;
         }
 
         final float        randomKey;
@@ -179,14 +135,14 @@ public abstract class Spawn {
     }
 
     /**
-     * Creates and returns a specified Lifeform or null.
+     * Returns true if newborn successfully lives thru birth, false otherwise.
      * @param node     that Lifeform spawns in
      * @param lft      LifeformType to create
-     * @return Lifeform or null
+     * @return true if Lifeform lived thru birth
      */
-    public Lifeform spawnAt(final Node node, final LifeformType lft) {
+    public boolean spawnAt(final Node node, final LifeformType lft) {
         if (node == null || lft == null) {
-            return null;
+            return false;
         }
 
         try {
@@ -198,7 +154,8 @@ public abstract class Spawn {
             if (!terrain.equals(unspawnableTerrain) && !terrain.equals(lf.getInhabitable())) {
                 lf.setMortalityRate(mortalityRates.get(lft));
                 lf.init();
-                return lf;
+                setNewborn(lf);
+                return true;
             }
         } catch (final InstantiationException ex) {
             System.err.println("Error creating: " + lft);
@@ -214,6 +171,73 @@ public abstract class Spawn {
             System.exit(1);
         }
 
-        return null;
+        return false;
+    }
+
+    /**
+     * Returns newborn Lifeform, or null.
+     * @return newborn Lifeform or null
+     */
+    public Lifeform getNewborn() {
+        final Lifeform ret = newborn;
+        setNewborn(null);
+        return ret;
+    }
+
+    /*
+     * Sets newborn Lifeform as the specified newborn.
+     * @param newborn    Lifeform
+     */
+    private void setNewborn(final Lifeform newborn) {
+        this.newborn = newborn;
+    }
+
+    // ----------------------------------------- SETTERS -------------------------------------------
+
+    /**
+     * Add the specified terrain terraform probability for the specified Terrain.
+     * @param terrain        type
+     * @param probability    of a Node being the specified Terrain type
+     */
+    protected void addTerraformRate(final Terrain terrain, final float probability) {
+        terraformRate.put(terraformIndex, terrain);
+        terraformIndex += probability;
+    }
+
+    /**
+     * Add the specified spawnAt probability for the specified Lifeform.
+     * @param lft            LifeformType
+     * @param probability    of spawning
+     */
+    protected void addSpawnRate(final LifeformType lft, final float probability) {
+        spawnRate.put(spawnIndex, lft);
+        spawnIndex += probability;
+    }
+
+    /**
+     * Adds mortalityRate to specified LifeformType.
+     * @param lft     LifeformType
+     * @param rate    mortality rate
+     */
+    protected void addMortalityRate(final LifeformType lft, final float rate) {
+        mortalityRates.put(lft, rate);
+    }
+
+    /**
+     * Disallows spawning Lifeform on the specified Terrain.
+     * @param terrain    that cannot give birth to anything
+     */
+    protected void setUnspawnableTerrain(final Terrain terrain) {
+        unspawnableTerrain = terrain;
+    }
+
+    /**
+     * Sets the water convergence rate. (WARNING: exponential growth of Terrain.WATER once set)
+     * @param terrain    that Water Terrain converges at
+     * @param rate       that Water Terrain converges at
+     */
+    protected void setConvergingTerrain(final Terrain terrain, final float rate) {
+        convergingTerrain = terrain;
+        convergingRate    = rate;
     }
 }

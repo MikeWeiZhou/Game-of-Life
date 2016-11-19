@@ -22,7 +22,7 @@ import javax.swing.JFrame;
  * World.
  *
  * @author  Wei Zhou
- * @version 2016-11-17
+ * @version 2016-11-19
  * @since   2016-11-06
  */
 public class World {
@@ -60,6 +60,24 @@ public class World {
         renderer.init(); // must be initiated last
     }
 
+    /*
+     * Populates the World with Terrain and Lifeforms.
+     */
+    private void createWorld() {
+        for (int row = 0; row < getGrid().getRows(); row++) {
+            for (int col = 0; col < getGrid().getCols(); col++) {
+                Node location = getGrid().getNodeAt(row, col);
+                getSpawn().terraformAt(location);
+
+                if (getSpawn().spawnAt(location)) {
+                    lifeforms.add(getSpawn().getNewborn());
+                }
+            }
+        }
+    }
+
+    // ---------------------------------------- TAKE TURN ------------------------------------------
+
     /**
      * Takes a turn.
      */
@@ -85,6 +103,8 @@ public class World {
             }
         }
 
+        // must remove dead Lifeforms before rendering,
+        // or renders dead Lifeforms too
         removeDeadLifeforms();
         Collections.shuffle(lifeforms);
         renderer.update();
@@ -106,32 +126,13 @@ public class World {
     }
 
     /*
-     * Populates the World with Terrain and Lifeforms.
-     */
-    private void createWorld() {
-        for (int row = 0; row < getGrid().getRows(); row++) {
-            for (int col = 0; col < getGrid().getCols(); col++) {
-                Node location = getGrid().getNodeAt(row, col);
-
-                getSpawn().terraformAt(location);
-
-                Lifeform lf = getSpawn().spawnAt(location);
-
-                if (lf != null) {
-                    lifeforms.add(lf);
-                }
-            }
-        }
-    }
-
-    /*
      * Removes all dead Lifeforms.
      */
     private void removeDeadLifeforms() {
-        Iterator<Lifeform> it = lifeforms.iterator();
-        while (it.hasNext()) {
-            if (!it.next().isAlive()) {
-                it.remove();
+        final Iterator<Lifeform> lf = lifeforms.iterator();
+        while (lf.hasNext()) {
+            if (!lf.next().isAlive()) {
+                lf.remove();
             }
         }
     }

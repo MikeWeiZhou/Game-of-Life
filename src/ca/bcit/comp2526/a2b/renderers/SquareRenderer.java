@@ -15,7 +15,7 @@ import javax.swing.JFrame;
  * SquareRenderer.
  *
  * @author  Wei Zhou
- * @version 2016-11-13
+ * @version 2016-11-18
  * @since   2016-11-06
  */
 public class SquareRenderer extends Renderer {
@@ -54,7 +54,7 @@ public class SquareRenderer extends Renderer {
         for (int row = 0; row < grid.getRows(); row++) {
             for (int col = 0; col < grid.getCols(); col++) {
                 Node location = grid.getNodeAt(row, col);
-                g2.setPaint(location.getColor());
+                g2.setPaint(location.getTerrainColor());
                 g2.fill(new Rectangle2D.Double(
                         location.getPoint().x,
                         location.getPoint().y,
@@ -65,11 +65,11 @@ public class SquareRenderer extends Renderer {
         }
 
         // draw Lifeforms
-        for (int i = 0; i < lifeforms.length; i++) {
-            Node location = lifeforms[i].getLocation();
-            g2.setPaint(lifeforms[i].getColor());
+        for (Lifeform lf : lifeforms) {
+            Node location = lf.getLocation();
+            g2.setPaint(lf.getColor());
 
-            if (lifeforms[i].getLifeformType() == LifeformType.PLANT) {
+            if (lf.getLifeformType() == LifeformType.PLANT) {
                 g2.fill(new Rectangle2D.Double(
                         location.getPoint().x + plantOffset,
                         location.getPoint().y + plantOffset,
