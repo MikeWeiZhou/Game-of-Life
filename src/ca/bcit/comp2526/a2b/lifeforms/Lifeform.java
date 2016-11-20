@@ -130,8 +130,7 @@ public abstract class Lifeform {
             return makeBabies(emptyNodes.iterator(), numOfBabies);
         }
 
-        // return an array of size 0; no newborns
-        return new Lifeform[0];
+        return new Lifeform[0]; // no newborns
     }
 
     /**
@@ -146,13 +145,16 @@ public abstract class Lifeform {
      * If it survives, age its color too.
      */
     protected void age() {
-        final float   rand       = getRandom().nextFloat();
-        final boolean mortalized = 0 <= rand && rand <= getMortalityRate();
+        final float   randFloat;
+        final boolean mortalized;
 
         if (!getLocation().getTerrain().equals(FOUNTAIN_OF_YOUTH)) {
             setHealth(getHealth() - 1);
         }
 
+        randFloat  = getRandom().nextFloat();
+        mortalized = 0 <= randFloat && randFloat <= getMortalityRate();
+        
         if (getHealth() <= 0 || mortalized) {
             kill();
         } else {
@@ -181,8 +183,7 @@ public abstract class Lifeform {
         final List<Lifeform> newborns = new ArrayList<Lifeform>();
 
         while (emptyNodes.hasNext() && maxBabies > 0) {
-            Node location = emptyNodes.next();
-            Lifeform lf;
+            final Node location = emptyNodes.next();
 
             if (location.getTerrain().equals(getInhabitable())) {
                 continue;
@@ -192,7 +193,6 @@ public abstract class Lifeform {
                 newborns.add(getNewborn());
             }
 
-            emptyNodes.remove();
             --maxBabies;
         }
 
@@ -277,13 +277,7 @@ public abstract class Lifeform {
      * Sets the Node that this Lifeform is in.
      * @param newLocation    that Lifeform will move to
      */
-    protected void moveTo(final Node newLocation) {
-        if (newLocation == location) {
-            return;
-        }
-
-        location.removeInhabitant();
-        newLocation.setInhabitant(this);
+    protected void setLocation(final Node newLocation) {
         location = newLocation;
     }
 
@@ -300,7 +294,7 @@ public abstract class Lifeform {
      * @param color    default Color of this Lifeform
      */
     protected void setDefaultColor(final Color color) {
-        this.defaultColor = color;
+        defaultColor = color;
     }
 
     /**
@@ -316,7 +310,7 @@ public abstract class Lifeform {
      * @param health    max health for this Lifeform
      */
     protected void setMaxHealth(final int health) {
-        this.maxHealth = health;
+        maxHealth = health;
     }
 
     // ------------------------------------------ GETTERS ------------------------------------------

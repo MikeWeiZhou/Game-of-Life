@@ -5,7 +5,7 @@ import ca.bcit.comp2526.a2b.grids.GridType;
 import ca.bcit.comp2526.a2b.grids.SquareGrid;
 import ca.bcit.comp2526.a2b.renderers.Renderer;
 import ca.bcit.comp2526.a2b.renderers.SquareRenderer;
-import ca.bcit.comp2526.a2b.spawns.HerbivoresOnly;
+import ca.bcit.comp2526.a2b.spawns.AllIDoIsEat;
 import ca.bcit.comp2526.a2b.spawns.NaturalSpawn;
 import ca.bcit.comp2526.a2b.spawns.OmnivoresOnly;
 import ca.bcit.comp2526.a2b.spawns.Spawn;
@@ -38,7 +38,7 @@ public final class Factory {
 
         SPAWN_CLASSES = new HashMap<SpawnType, Class<? extends Spawn>>();
         SPAWN_CLASSES.put(SpawnType.NATURAL_SPAWN,   NaturalSpawn.class);
-        SPAWN_CLASSES.put(SpawnType.HERBIVORES_ONLY, HerbivoresOnly.class);
+        SPAWN_CLASSES.put(SpawnType.ALL_I_DO_IS_EAT, AllIDoIsEat.class);
         SPAWN_CLASSES.put(SpawnType.OMNIVORES_ONLY,  OmnivoresOnly.class);
     }
 

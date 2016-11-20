@@ -10,5 +10,23 @@ package ca.bcit.comp2526.a2b.grids;
 public enum GridType {
 
     /** SquareGrid with SquareRenderer. */
-    SQUARE
+    SQUARE("Square");
+
+    private final String name;
+
+    /**
+     * Constructor.
+     * @param name    of GridType.
+     */
+    GridType(final String name) {
+        this.name = name;
+    }
+
+    /**
+     * Returns name of GridType.
+     * @return name of GridType.
+     */
+    public String getName() {
+        return name;
+    }
 }

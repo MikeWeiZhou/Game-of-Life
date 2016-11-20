@@ -106,11 +106,13 @@ public abstract class Animal extends Lifeform {
      * Move to target Node if not null.
      */
     protected void move() {
-        if (getTargetLocation() == null) {
+        if (getTargetLocation() == null || getTargetLocation().hasLivingInhabitant()) {
             return;
         }
 
-        moveTo(getTargetLocation());
+        getLocation().removeInhabitant();
+        getTargetLocation().setInhabitant(this);
+        setLocation(getTargetLocation());
     }
 
     /*

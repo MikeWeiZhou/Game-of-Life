@@ -1,15 +1,17 @@
 package ca.bcit.comp2526.a2b.renderers;
 
+import ca.bcit.comp2526.a2b.NotifyWhenGameOver;
 import ca.bcit.comp2526.a2b.World;
 import ca.bcit.comp2526.a2b.grids.Grid;
 import ca.bcit.comp2526.a2b.lifeforms.Lifeform;
 
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.RenderingHints;
-import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 /**
@@ -19,15 +21,10 @@ import javax.swing.JPanel;
  * @version 2016-11-19
  * @since   2016-11-06
  */
-public abstract class Renderer extends JPanel {
+public abstract class Renderer extends JPanel implements NotifyWhenGameOver {
 
-    private static final Toolkit TOOLKIT;
-
-    static {
-        TOOLKIT = Toolkit.getDefaultToolkit();
-    }
-
-    private final World world;
+    private final World   world;
+    private       boolean gameover;
 
     /**
      * Constructor.
@@ -35,6 +32,7 @@ public abstract class Renderer extends JPanel {
      */
     public Renderer(final World world) {
         this.world = world;
+        gameover   = false;
     }
 
     /**
@@ -42,8 +40,7 @@ public abstract class Renderer extends JPanel {
      */
     public void init() {
         setPreferredSize(world.getGrid().getSize());
-        world.getFrame().add(this);
-        world.getFrame().setLocation(centerOnScreen(world.getGrid().getSize()));
+        world.notifyWhenGameOver(this);
     }
 
     // ------------------------------------------- DRAW --------------------------------------------
@@ -55,14 +52,44 @@ public abstract class Renderer extends JPanel {
         repaint();
     }
 
+    public void gameover() {
+        gameover = true;
+        update();
+    }
+
     /**
      * Draws the World onto frame.
      * @param graphics    object
      */
     public void paint(final Graphics graphics) {
         final Graphics2D g2 = (Graphics2D) graphics;
-        setGraphicsOptions(g2);
-        drawWorld(g2, world.getGrid(), world.getLifeforms());
+
+        if (gameover) {
+            drawWorldMap(g2);
+        } else {
+            setGraphicsOptions(g2);
+            drawWorld(g2, world.getGrid(), world.getLifeforms());
+        }
+
+    }
+
+    /**
+     * Draws World Map.
+     * @param g2    Graphics2D object
+     */
+    public void drawWorldMap(final Graphics2D g2) {
+        try {
+            BufferedImage img = ImageIO.read(new File("worldmap.jpg"));
+
+            final int width  = (int) world.getGrid().getSize().getWidth();
+            final int height = (int) world.getGrid().getSize().getHeight();
+
+            g2.drawImage(img, 0, 0, width, height, null);
+        } catch (final IOException ex) {
+            System.err.println("Renderer: can not find worldmap.jpg");
+            System.err.println("God damn it, failed at the last step!");
+            System.exit(1);
+        }
     }
 
     // ------------------------------------------ ABSTRACTS ----------------------------------------
@@ -76,21 +103,6 @@ public abstract class Renderer extends JPanel {
     public abstract void drawWorld(Graphics2D g2, Grid grid, Lifeform[] lifeforms);
 
     // ----------------------------------------- OPTIONS -------------------------------------------
-
-    /**
-     * Returns the centre point of the screen.
-     * @param size    a Dimension
-     * @return a Point that refers to the centre point of the screen.
-     */
-    public Point centerOnScreen(final Dimension size) {
-        final Dimension screenSize;
-        if (size == null) {
-            throw new IllegalArgumentException("Size cannot be null");
-        }
-        screenSize = TOOLKIT.getScreenSize();
-        return (new Point((screenSize.width - size.width) / 2,
-                (screenSize.height - size.height) / 2));
-    }
 
     /*
      * Sets up anti-aliasing for drawing.

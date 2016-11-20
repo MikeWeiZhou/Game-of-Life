@@ -20,13 +20,18 @@ public class OmnivoresOnly extends Spawn {
     public OmnivoresOnly(final World world) {
         super(world);
 
+        setUnspawnableTerrain(Terrain.WATER);
+        setConvergingTerrain(Terrain.WATER, 1.7f); // adds exponential growth to Terrain
+
+        addTerraformRate(Terrain.WATER, 0.01f);
+        addTerraformRate(Terrain.LAND,  0.99f);
+
         addSpawnRate(LifeformType.PLANT,    0.3f);
-        addSpawnRate(LifeformType.OMNIVORE, 0.1f);
+        addSpawnRate(LifeformType.CARNIVORE, 0.1f);
+        addSpawnRate(LifeformType.HERBIVORE, 0.2f);
 
         addMortalityRate(LifeformType.PLANT,    0.01f);
-        addMortalityRate(LifeformType.OMNIVORE, 0.001f);
-
-        addTerraformRate(Terrain.WATER, 0.03f);
-        addTerraformRate(Terrain.LAND,  0.97f);
+        addMortalityRate(LifeformType.CARNIVORE, 0.00001f);
+        addMortalityRate(LifeformType.HERBIVORE, 0.2f);
     }
 }

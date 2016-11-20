@@ -18,7 +18,8 @@ import java.awt.Dimension;
  */
 public abstract class Grid {
 
-    /* Levels of neighboring Nodes to calculate */
+    /* Levels of neighboring Nodes to calculate.
+     * Must be equal to the highest movement of any Lifeform. */
     private static final int NEIGHBOR_LEVELS = 2;
 
     private final Node[][]  nodes;
@@ -109,7 +110,7 @@ public abstract class Grid {
      * @param node    used to calculate neighboring Cells
      * @return neighboring Cells
      */
-    protected abstract Node[] calcNeighborsForLevel(final int lvl,
+    protected abstract Node[] calcNeighborsForLevel(final int  lvl,
                                                     final Node node);
 
     // ----------------------------------------- GETTERS -------------------------------------------

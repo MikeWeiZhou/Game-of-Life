@@ -4,18 +4,19 @@ import ca.bcit.comp2526.a2b.grids.Grid;
 import ca.bcit.comp2526.a2b.grids.GridType;
 import ca.bcit.comp2526.a2b.grids.Node;
 import ca.bcit.comp2526.a2b.lifeforms.Lifeform;
+import ca.bcit.comp2526.a2b.lifeforms.LifeformType;
 import ca.bcit.comp2526.a2b.renderers.Renderer;
 import ca.bcit.comp2526.a2b.spawns.Spawn;
 import ca.bcit.comp2526.a2b.spawns.SpawnType;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
-import javax.swing.JFrame;
+import java.util.Set;
 
 /**
  * World.
@@ -30,48 +31,47 @@ public class World {
     private static final int COLS;
     private static final int NODE_LENGTH;
 
+    private static final int MIN_LIFEFORMS;
+    private static final int CHECK_GAMEOVER_INTERVAL;
+
     static {
         ROWS        = 160;
         COLS        = 80;
         NODE_LENGTH = 6;
+
+        MIN_LIFEFORMS           = 5;
+        CHECK_GAMEOVER_INTERVAL = 50;
     }
 
-    private final JFrame         frame;
     private final Random         random;
     private final List<Lifeform> lifeforms;
     private final Grid           grid;
     private final Spawn          spawn;
     private final Renderer       renderer;
+    private       int            turnsPassed;
 
-    private final List<Long>     timer;
-    private       int            turnsTimed;
+    private final List<NotifyWhenGameOver> observers;
 
     /**
      * Constructor.
-     * @param gameFrame    game frame to draw on
      * @param gridType     type of grid
      * @param spawnType    type of spawn
      */
-    public World(final JFrame gameFrame, final GridType gridType, final SpawnType spawnType) {
-        frame     = gameFrame;
-        random    = new Random();
-        lifeforms = new ArrayList<Lifeform>();
-        grid      = Factory.createGrid(gridType, ROWS, COLS, NODE_LENGTH);
-        spawn     = Factory.createSpawn(spawnType, this);
-        renderer  = Factory.createRenderer(gridType, this);
+    public World(final GridType gridType, final SpawnType spawnType) {
+        random      = new Random();
+        lifeforms   = new ArrayList<Lifeform>();
+        grid        = Factory.createGrid(gridType, ROWS, COLS, NODE_LENGTH);
+        spawn       = Factory.createSpawn(spawnType, this);
+        renderer    = Factory.createRenderer(gridType, this);
+        turnsPassed = 0;
 
-        timer      = new ArrayList<Long>();
-        turnsTimed = 0;
+        observers = new ArrayList<NotifyWhenGameOver>();
     }
 
     /**
      * Initializes this World.
      */
     public void init() {
-        if (frame == null) {
-            throw new IllegalStateException("World: must have a valid game frame.");
-        }
-
         grid.init();
         spawn.init();
         createWorld();   // must be initiated after grid and spawn
@@ -100,10 +100,9 @@ public class World {
      * Takes a turn.
      */
     public void takeTurn() {
-        long t1 = 0;
-        long t2;
-        if (++turnsTimed < 250) {
-            t1 = new Date().getTime();
+        if (++turnsPassed == CHECK_GAMEOVER_INTERVAL) {
+            checkGameover();
+            turnsPassed = 0;
         }
 
         // all living Lifeforms take action
@@ -126,21 +125,6 @@ public class World {
         removeDeadLifeforms();
         Collections.shuffle(lifeforms);
         renderer.update();
-
-        if (turnsTimed < 250) {
-            t2 = new Date().getTime();
-            long avg = t2 - t1;
-            timer.add(avg);
-        } else if (turnsTimed == 250) {
-            long sum = 0;
-            for (long time : timer) {
-                sum += time;
-            }
-            long avg = sum / timer.size();
-            System.out.println("Average time per turn calculations: " + avg + " ms");
-            turnsTimed = 0;
-            timer.clear();
-        }
     }
 
     /*
@@ -155,7 +139,54 @@ public class World {
         }
     }
 
+    // ----------------------------------------- OBSERVERS -----------------------------------------
+
+    /**
+     * Adds observer to the list of observers that will be notified when game is over.
+     * @param observer    to be added
+     */
+    public void notifyWhenGameOver(final NotifyWhenGameOver observer) {
+        observers.add(observer);
+    }
+
+    /*
+     * Notifies all observers if number of Lifeforms cannot support an ecosystem; Game over.
+     */
+    private void checkGameover() {
+        if (lifeforms.size() < MIN_LIFEFORMS) {
+            notifyObservers();
+        } else {
+            final Set<LifeformType> species = new HashSet<LifeformType>();
+            for (Lifeform lf : getLifeforms()) {
+                if (!species.contains(lf.getLifeformType())) {
+                    species.add(lf.getLifeformType());
+                }
+            }
+
+            if (species.size() <= 1) {
+                notifyObservers();
+            }
+        }
+    }
+
+    /*
+     * Notify all observers that the game is over.
+     */
+    private void notifyObservers() {
+        for (NotifyWhenGameOver observer : observers) {
+            observer.gameover();
+        }
+    }
+
     // ------------------------------------------ GETTERS ------------------------------------------
+
+    /**
+     * Returns this World's Renderer.
+     * @return Renderer
+     */
+    public Renderer getRenderer() {
+        return renderer;
+    }
 
     /**
      * Returns the Random generator from this World.
@@ -163,14 +194,6 @@ public class World {
      */
     public Random getRandom() {
         return random;
-    }
-
-    /**
-     * Returns the game frame of this World.
-     * @return game frame as JFrame
-     */
-    public JFrame getFrame() {
-        return frame;
     }
 
     /**
