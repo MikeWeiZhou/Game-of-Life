@@ -33,7 +33,7 @@ public class NaturalSpawn extends Spawn {
 
         addMortalityRate(LifeformType.PLANT,     0.01f);
         addMortalityRate(LifeformType.HERBIVORE, 0.2f);
-        addMortalityRate(LifeformType.CARNIVORE, 0.00000001f);
-        addMortalityRate(LifeformType.OMNIVORE,  0.055f);
+        addMortalityRate(LifeformType.CARNIVORE, 0.0000001f);
+        addMortalityRate(LifeformType.OMNIVORE,  0.065f);
     }
 }

@@ -12,7 +12,7 @@ import ca.bcit.comp2526.a2b.grids.Node;
  */
 public abstract class Animal extends Lifeform {
 
-    private Node targetNode;
+    private Node targetLocation;
 
     /**
      * Constructs a new Animal.
@@ -81,7 +81,36 @@ public abstract class Animal extends Lifeform {
             }
         }
 
-        setTargetNode(target);
+        setTargetLocation(target);
+    }
+
+    /**
+     * Eats Lifeform at target Node, if edible.
+     */
+    protected void eat() {
+        if (getTargetLocation() == null || !getTargetLocation().hasLivingInhabitant()) {
+            return;
+        }
+
+        Lifeform lf = getTargetLocation().getInhabitant();
+        if (lf.hasTrait(getTargetTrait())) {
+            lf.kill();
+
+            // +1 due to age() being called after eating
+            // age() takes 1 health away
+            setHealth(getMaxHealth() + 1);
+        }
+    }
+
+    /**
+     * Move to target Node if not null.
+     */
+    protected void move() {
+        if (getTargetLocation() == null) {
+            return;
+        }
+
+        moveTo(getTargetLocation());
     }
 
     /*
@@ -97,43 +126,14 @@ public abstract class Animal extends Lifeform {
         }
     }
 
-    /**
-     * Eats Lifeform at target Node, if edible.
-     */
-    protected void eat() {
-        if (getTargetNode() == null || !getTargetNode().hasLivingInhabitant()) {
-            return;
-        }
-
-        Lifeform lf = getTargetNode().getInhabitant();
-        if (lf.hasTrait(getTargetTrait())) {
-            lf.kill();
-
-            // +1 due to age() being called after eating
-            // age() takes 1 health away
-            setHealth(getMaxHealth() + 1);
-        }
-    }
-
-    /**
-     * Move to target Node if not null.
-     */
-    protected void move() {
-        if (getTargetNode() == null) {
-            return;
-        }
-
-        setLocation(getTargetNode());
-    }
-
     // ----------------------------------------- SETTERS -------------------------------------------
 
     /**
      * Sets the target Node.
      * @param target    Node
      */
-    protected void setTargetNode(final Node target) {
-        targetNode = target;
+    protected void setTargetLocation(final Node target) {
+        targetLocation = target;
     }
 
     // ----------------------------------------- GETTERS -------------------------------------------
@@ -142,7 +142,7 @@ public abstract class Animal extends Lifeform {
      * Returns target Node.
      * @return target Node
      */
-    protected Node getTargetNode() {
-        return targetNode;
+    protected Node getTargetLocation() {
+        return targetLocation;
     }
 }

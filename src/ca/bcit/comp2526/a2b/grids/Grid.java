@@ -90,6 +90,7 @@ public abstract class Grid {
 
     /**
      * Calculates and returns the size of Grid.
+     * @param length    of each Node
      * @return Dimension
      */
     protected abstract Dimension calcSize(int length);
@@ -114,7 +115,7 @@ public abstract class Grid {
     // ----------------------------------------- GETTERS -------------------------------------------
 
     /**
-     * Returns true if row & column is in bounds.
+     * Returns true if row and column is in bounds.
      * @param row    of Grid
      * @param col    of Grid
      * @return true if in bounds

@@ -277,7 +277,7 @@ public abstract class Lifeform {
      * Sets the Node that this Lifeform is in.
      * @param newLocation    that Lifeform will move to
      */
-    protected void setLocation(final Node newLocation) {
+    protected void moveTo(final Node newLocation) {
         if (newLocation == location) {
             return;
         }
@@ -289,6 +289,7 @@ public abstract class Lifeform {
 
     /**
      * Sets the Color of this Lifeform.
+     * @param color    of this Lifeform
      */
     protected void setColor(final Color color) {
         this.color = color;
@@ -296,6 +297,7 @@ public abstract class Lifeform {
 
     /**
      * Sets the default Color of this Lifeform.
+     * @param color    default Color of this Lifeform
      */
     protected void setDefaultColor(final Color color) {
         this.defaultColor = color;
@@ -346,6 +348,7 @@ public abstract class Lifeform {
 
     /**
      * Returns inhabitable Terrain for this Animal.
+     * @return inhabitable Terrain for this Lifeform
      */
     public Terrain getInhabitable() {
         return inhabitable;
@@ -385,6 +388,7 @@ public abstract class Lifeform {
 
     /**
      * Returns the targeted Trait of this Lifeform.
+     * @return target Trait for this Lifeform
      */
     public Trait getTargetTrait() {
         return targetTrait;
@@ -416,6 +420,7 @@ public abstract class Lifeform {
 
     /**
      * Returns the max movement for this animal.
+     * @return maximum movement/steps per turn
      */
     public int getMovement() {
         return movement;

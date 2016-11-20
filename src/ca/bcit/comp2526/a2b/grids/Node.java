@@ -33,6 +33,7 @@ public class Node {
 
     /**
      * Constructs a Node.
+     * @param point        x, y coordinates of this Node
      * @param row          of this Node
      * @param col          of this Node
      */

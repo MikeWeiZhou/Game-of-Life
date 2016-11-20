@@ -23,7 +23,7 @@ import java.util.Map;
  * @version 2016-11-19
  * @since   2016-11-19
  */
-public class Factory {
+public final class Factory {
 
     private static final Map<GridType, Class<? extends Grid>>     GRID_CLASSES;
     private static final Map<GridType, Class<? extends Renderer>> RENDERER_CLASSES;
