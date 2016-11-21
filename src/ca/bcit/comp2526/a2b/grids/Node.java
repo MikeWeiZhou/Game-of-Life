@@ -85,11 +85,19 @@ public class Node implements Renderable {
     // ------------------------------------------- GETTERS -----------------------------------------
 
     /**
+     * Returns true if Node has a Terrain.
+     * @return true if Node has a Terrain
+     */
+    public boolean hasTerrain() {
+        return terrain != null;
+    }
+
+    /**
      * Returns true if Node has a living inhabitant.
      * @return True if Lifeform inhabiting at this Node is alive
      */
     public boolean hasLivingInhabitant() {
-        return (inhabitant != null && inhabitant.isAlive());
+        return inhabitant != null && inhabitant.isAlive();
     }
 
     /**

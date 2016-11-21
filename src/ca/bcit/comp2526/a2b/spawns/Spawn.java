@@ -11,7 +11,11 @@ import ca.bcit.comp2526.a2b.lifeforms.LifeformType;
 import ca.bcit.comp2526.a2b.lifeforms.Omnivore;
 import ca.bcit.comp2526.a2b.lifeforms.Plant;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
@@ -20,14 +24,18 @@ import java.util.TreeMap;
  * Spawn.
  *
  * @author  Wei Zhou
- * @version 2016-11-19
+ * @version 2016-11-20
  * @since   2016-11-06
  */
 public abstract class Spawn {
 
+    private static final float TERRAIN_CONVERGENCE_FACTOR;
     private static final Map<LifeformType, Class<? extends Lifeform>> CLASSES;
 
     static {
+        // probability of Terrain convergence (0f - 0.99f)
+        TERRAIN_CONVERGENCE_FACTOR = .99f;
+
         CLASSES = new HashMap<LifeformType, Class<? extends Lifeform>>();
         CLASSES.put(LifeformType.PLANT,     Plant.class);
         CLASSES.put(LifeformType.HERBIVORE, Herbivore.class);
@@ -42,16 +50,16 @@ public abstract class Spawn {
     private final TreeMap<Float, LifeformType> spawnRate;
     private       float                        spawnIndex;
     private final Map<LifeformType, Float>     mortalityRates;
+    private       Lifeform                     newborn;
 
     // Terrains
-    private final TreeMap<Float, Terrain>      terraformRate;
-    private       float                        terraformIndex;
+    private final TreeMap<Terrain, Float>      terraformRate;
     private       Terrain                      unspawnableTerrain;
-    private       Terrain                      convergingTerrain;
-    private       float                        convergingRate;
+    // Tracks Terraform Process
+    private       int                          terraformCounter;
+    private       Terrain                      terraformTerrain;
 
     // Misc
-    private       Lifeform                     newborn;
     private       boolean                      variablesLocked;
 
     /**
@@ -62,13 +70,15 @@ public abstract class Spawn {
         this.world     = world;
         random         = world.getRandom();
 
+        // Lifeforms
         spawnRate      = new TreeMap<Float, LifeformType>();
         spawnIndex     = 0f;
         mortalityRates = new HashMap<LifeformType, Float>();
 
-        terraformRate  = new TreeMap<Float, Terrain>();
-        terraformIndex = 0f;
+        // Terrain
+        terraformRate  = new TreeMap<Terrain, Float>();
 
+        // Misc
         variablesLocked = false;
     }
 
@@ -88,53 +98,116 @@ public abstract class Spawn {
             throw new IllegalStateException("Failed to initialize Spawn: spawn rates cannot sum "
                     + "up to over 100%");
         }
-        if (terraformIndex != 1.0f) {
-            throw new IllegalStateException("Failed to initialize Spawn: terrain distribution "
-                    + "does not equate to 100%");
-        }
-        if (convergingRate > 0 && convergingTerrain == null) {
-            throw new IllegalStateException("Failed to initialize Spawn: converging Terrain not "
-                    + "set");
-        }
+        checkTerraformRates();
 
         addSpawnRate(null, 1.0f); // fill in spawn rates in case they don't sum up to 100%
         variablesLocked = true;
     }
 
-    // ------------------------------- TERRAFORMING & SPAWNING -------------------------------------
+    /*
+     * Throws error if terraformRates does not sum up to 100%.
+     */
+    private void checkTerraformRates() {
+        float terraformRateSum = 0;
+        for (Map.Entry<Terrain, Float> entry : terraformRate.entrySet()) {
+            terraformRateSum += entry.getValue();
+        }
+        if (terraformRateSum != 1.0f) {
+            throw new IllegalStateException("Failed to initialize Spawn: terrain distribution "
+                    + "does not equate to 100%");
+        }
+    }
+
+    // ------------------------------------ TERRAFORMING -------------------------------------------
 
     /**
-     * Terraforms the specified Node into a random Terrain based on selected probabilities.
-     * @param location    Node
+     * Terraforms all Nodes in the Grid.
      */
-    public void terraformAt(final Node location) {
-        if (location == null) {
-            return;
+    public void terraform() {
+        final List<Node> allNodes = getAllNodes();
+        Collections.shuffle(allNodes);
+
+        // terraform one type of Terrain at a time
+        for (Map.Entry<Terrain, Float> entry : terraformRate.entrySet()) {
+            Iterator<Node> barren = allNodes.iterator();
+            terraformTerrain = entry.getKey();
+            terraformCounter = Math.round(
+                    entry.getValue() * world.getGrid().getCols() * world.getGrid().getRows()
+            );
+
+            // attempt to terraform barren Node
+            while (barren.hasNext() && terraformCounter > 0) {
+                Node node = barren.next();
+                if (node.hasTerrain()) {
+                    barren.remove();
+                    continue;
+                }
+                terraformAt(node, 1.0f);
+            }
         }
 
-        Terrain terrain   = terraformRate.get(terraformRate.lowerKey(random.nextFloat()));
-        Node[]  neighbors = location.getImmediateNeighbors();
+        // there may be left over Nodes without a Terrain due to rounding issues
+        for (Node node : allNodes) {
+            if (node.hasTerrain()) {
+                continue;
+            }
+            node.setTerrain(terraformTerrain);
+        }
+    }
 
-        if (convergingRate > 0) {
-            float convergeProbability;
-            int   waterNeighborCount;
+    /*
+     * Terraforms the current Node and subsequent neighboring Nodes recursively.
+     * @param location       Node
+     * @param probability    of terraforming
+     */
+    private void terraformAt(final Node location, final float probability) {
+        final Node[]  neighbors;
+        final boolean chance;
+        int neighborsAlike = 0;
 
-            waterNeighborCount = 0;
+        // count neighbors with same Terrain
+        neighbors = location.getImmediateNeighbors();
+        for (Node neighbor : neighbors) {
+            if (neighbor.hasTerrain() && neighbor.getTerrain().equals(terraformTerrain)) {
+                neighborsAlike++;
+            }
+        }
+
+        // terraform if probability is right and we didn't exceed #s for this type of Terrain
+        chance = random.nextFloat() <= (probability + (neighborsAlike / neighbors.length));
+        if (chance && terraformPermitted()) {
+            location.setTerrain(terraformTerrain);
             for (Node neighbor : neighbors) {
-                Terrain neighborTerrain = neighbor.getTerrain();
-                if (neighborTerrain != null && neighborTerrain.equals(convergingTerrain)) {
-                    waterNeighborCount++;
+                if (!neighbor.hasTerrain()) {
+                    terraformAt(neighbor, probability * TERRAIN_CONVERGENCE_FACTOR);
                 }
             }
+        }
+    }
 
-            convergeProbability = convergingRate * ((float) waterNeighborCount / neighbors.length);
-            if (waterNeighborCount > 0 && random.nextFloat() <= convergeProbability) {
-                terrain = convergingTerrain;
+    /*
+     * Generates and returns all Nodes from the Grid.
+     * @return list of Nodes
+     */
+    private List<Node> getAllNodes() {
+        final List<Node> nodes = new ArrayList<Node>();
+        for (int row = 0; row < world.getGrid().getRows(); row++) {
+            for (int col = 0; col < world.getGrid().getCols(); col++) {
+                nodes.add(world.getGrid().getNodeAt(row, col));
             }
         }
-
-        location.setTerrain(terrain);
+        return nodes;
     }
+
+    /*
+     * Returns true if terraforming is permitted for the current terraformTerrain.
+     * @return boolean
+     */
+    private boolean terraformPermitted() {
+        return terraformCounter-- > 0;
+    }
+
+    // ---------------------------------------- SPAWNING -------------------------------------------
 
     /**
      * Returns true if newborn successfully lives thru birth, false otherwise.
@@ -209,9 +282,7 @@ public abstract class Spawn {
         if (variablesLocked) {
             return;
         }
-
-        terraformRate.put(terraformIndex, terrain);
-        terraformIndex += probability;
+        terraformRate.put(terrain, probability);
     }
 
     /**
@@ -223,7 +294,6 @@ public abstract class Spawn {
         if (variablesLocked) {
             return;
         }
-
         spawnRate.put(spawnIndex, lft);
         spawnIndex += probability;
     }
@@ -237,7 +307,6 @@ public abstract class Spawn {
         if (variablesLocked) {
             return;
         }
-
         mortalityRates.put(lft, rate);
     }
 
@@ -249,21 +318,6 @@ public abstract class Spawn {
         if (variablesLocked) {
             return;
         }
-
         unspawnableTerrain = terrain;
-    }
-
-    /**
-     * Sets the water convergence rate. (WARNING: exponential growth of Terrain.WATER once set)
-     * @param terrain    that Water Terrain converges at
-     * @param rate       that Water Terrain converges at
-     */
-    protected void setConvergingTerrain(final Terrain terrain, final float rate) {
-        if (variablesLocked) {
-            return;
-        }
-
-        convergingTerrain = terrain;
-        convergingRate    = rate;
     }
 }

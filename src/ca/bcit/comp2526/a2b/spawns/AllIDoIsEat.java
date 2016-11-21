@@ -21,10 +21,9 @@ public class AllIDoIsEat extends Spawn {
         super(world);
 
         setUnspawnableTerrain(Terrain.WATER);
-        setConvergingTerrain(Terrain.WATER, 1.7f); // adds exponential growth to Terrain
 
-        addTerraformRate(Terrain.WATER, 0.01f);
-        addTerraformRate(Terrain.LAND,  0.99f);
+        addTerraformRate(Terrain.WATER, 0.1f);
+        addTerraformRate(Terrain.LAND,  0.9f);
 
         addSpawnRate(LifeformType.PLANT,     0.3f);
         addSpawnRate(LifeformType.HERBIVORE, 0.25f);

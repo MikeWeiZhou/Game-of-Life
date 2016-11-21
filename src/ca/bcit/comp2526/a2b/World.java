@@ -22,7 +22,7 @@ import java.util.Set;
  * World.
  *
  * @author  Wei Zhou
- * @version 2016-11-19
+ * @version 2016-11-20
  * @since   2016-11-06
  */
 public class World {
@@ -82,11 +82,11 @@ public class World {
      * Populates the World with Terrain and Lifeforms.
      */
     private void createWorld() {
+        getSpawn().terraform();
+
         for (int row = 0; row < getGrid().getRows(); row++) {
             for (int col = 0; col < getGrid().getCols(); col++) {
-                Node location = getGrid().getNodeAt(row, col);
-                getSpawn().terraformAt(location);
-
+                final Node location = getGrid().getNodeAt(row, col);
                 if (getSpawn().spawnAt(location)) {
                     lifeforms.add(getSpawn().getNewborn());
                 }

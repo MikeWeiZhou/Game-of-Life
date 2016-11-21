@@ -21,10 +21,9 @@ public class GiantMess extends Spawn {
         super(world);
 
         setUnspawnableTerrain(Terrain.WATER);
-        setConvergingTerrain(Terrain.WATER, 1.7f); // adds exponential growth to Terrain
 
-        addTerraformRate(Terrain.WATER, 0.01f);
-        addTerraformRate(Terrain.LAND,  0.99f);
+        addTerraformRate(Terrain.WATER, 0.1f);
+        addTerraformRate(Terrain.LAND,  0.9f);
 
         addSpawnRate(LifeformType.PLANT,     0.30f);
         addSpawnRate(LifeformType.HERBIVORE, 0.22f);
@@ -34,6 +33,6 @@ public class GiantMess extends Spawn {
         addMortalityRate(LifeformType.PLANT,     0.01f);
         addMortalityRate(LifeformType.HERBIVORE, 0.2f);
         addMortalityRate(LifeformType.CARNIVORE, 0.0000001f);
-        addMortalityRate(LifeformType.OMNIVORE,  0.065f);
+        addMortalityRate(LifeformType.OMNIVORE,  0.055f);
     }
 }
