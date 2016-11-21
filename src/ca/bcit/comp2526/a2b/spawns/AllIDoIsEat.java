@@ -30,6 +30,6 @@ public class AllIDoIsEat extends Spawn {
         addSpawnRate(LifeformType.HERBIVORE, 0.25f);
 
         addMortalityRate(LifeformType.PLANT,     0.01f);
-        addMortalityRate(LifeformType.HERBIVORE, 0.18f);
+        addMortalityRate(LifeformType.HERBIVORE, 0.17f);
     }
 }

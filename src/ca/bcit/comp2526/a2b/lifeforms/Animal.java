@@ -120,8 +120,9 @@ public abstract class Animal extends Lifeform {
      * @param nodes    to shuffle
      */
     private void shuffleNodes(final Node[] nodes) {
-        for (int i = 1; i < nodes.length / 2; i++) {
-            int rand    = getRandom().nextInt(nodes.length);
+        final int shuffleRange = (int) (nodes.length * .8);
+        for (int i = shuffleRange; i > 0; i--) {
+            int rand    = getRandom().nextInt(i);
             Node tmp    = nodes[i];
             nodes[i]    = nodes[rand];
             nodes[rand] = tmp;

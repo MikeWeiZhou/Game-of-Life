@@ -40,7 +40,7 @@ public class World {
         NODE_LENGTH = 6;
 
         MIN_LIFEFORMS           = 5;
-        CHECK_GAMEOVER_INTERVAL = 50;
+        CHECK_GAMEOVER_INTERVAL = 70;
     }
 
     private final Random         random;

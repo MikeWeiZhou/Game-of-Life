@@ -5,19 +5,19 @@ import ca.bcit.comp2526.a2b.grids.Terrain;
 import ca.bcit.comp2526.a2b.lifeforms.LifeformType;
 
 /**
- * NaturalSpawn.
+ * GiantMess.
  *
  * @author  Wei Zhou
  * @version 2016-11-18
  * @since   2016-11-08
  */
-public class NaturalSpawn extends Spawn {
+public class GiantMess extends Spawn {
 
     /**
-     * Creates a new NaturalSpawn.
+     * Creates a new GiantMess.
      * @param world    that Lifeform will spawn in
      */
-    public NaturalSpawn(final World world) {
+    public GiantMess(final World world) {
         super(world);
 
         setUnspawnableTerrain(Terrain.WATER);

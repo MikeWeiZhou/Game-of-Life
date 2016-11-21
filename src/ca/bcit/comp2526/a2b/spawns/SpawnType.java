@@ -9,11 +9,11 @@ package ca.bcit.comp2526.a2b.spawns;
  */
 public enum SpawnType {
 
-    /** NaturalSpawn. */
-    NATURAL_SPAWN("Natural"),
+    /** GiantMess. */
+    GIANT_MESS("Giant Mess"),
 
-    /** OmnivoresOnly. */
-    OMNIVORES_ONLY("Omnivores"),
+    /** ChainReaction. */
+    CHAIN_REACTION("Chain Reaction"),
 
     /** AllIDoIsEat. */
     ALL_I_DO_IS_EAT("All I Do Is Eat");

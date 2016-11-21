@@ -3,9 +3,12 @@ package ca.bcit.comp2526.a2b.lifeforms;
 import ca.bcit.comp2526.a2b.World;
 import ca.bcit.comp2526.a2b.grids.Node;
 import ca.bcit.comp2526.a2b.grids.Terrain;
+import ca.bcit.comp2526.a2b.renderers.Renderable;
 
 import java.awt.Color;
+import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -16,10 +19,10 @@ import java.util.Set;
  * Lifeform.
  *
  * @author  Wei Zhou
- * @version 2016-11-19
+ * @version 2016-11-20
  * @since   2016-11-06
  */
-public abstract class Lifeform {
+public abstract class Lifeform implements Renderable {
 
     public static final Terrain FOUNTAIN_OF_YOUTH = Terrain.WATER;
 
@@ -126,6 +129,7 @@ public abstract class Lifeform {
                 && emptyNearby >= repNeighborsEmpty
                 && foodNearby >= repNeighborsFood) {
 
+            Collections.shuffle(emptyNodes);
             final int numOfBabies = getRandom().nextInt(repMaxBabies) + 1;
             return makeBabies(emptyNodes.iterator(), numOfBabies);
         }
@@ -392,8 +396,27 @@ public abstract class Lifeform {
      * Returns the Color of this Lifeform.
      * @return Color
      */
+    @Override
     public Color getColor() {
         return color;
+    }
+
+    /**
+     * Returns the length of this Lifeform.
+     * @return length
+     */
+    @Override
+    public int getLength() {
+        return getLocation().getLength();
+    }
+
+    /**
+     * Returns the Point where this Lifeform resides.
+     * @return Point
+     */
+    @Override
+    public Point getPoint() {
+        return getLocation().getPoint();
     }
 
     /**

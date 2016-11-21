@@ -2,18 +2,11 @@ package ca.bcit.comp2526.a2b.grids;
 
 import java.awt.Dimension;
 
-/*
- * TO DO:
- *
- *  - NEED CONFIRMATION: private int border: not needed, since each node stores
- *      the coordinates x & y of each Node already.
- */
-
 /**
  * Grid.
  *
  * @author  Wei Zhou
- * @version 2016-11-17
+ * @version 2016-11-20
  * @since   2016-11-06
  */
 public abstract class Grid {
@@ -26,7 +19,6 @@ public abstract class Grid {
     private final int       rows;
     private final int       cols;
     private final int       length;
-    private final int       border;
     private       Dimension size;
 
     /**
@@ -34,15 +26,12 @@ public abstract class Grid {
      * @param rows      to create
      * @param cols      to create
      * @param length    of Node
-     * @param border    size
      */
-    public Grid(final int rows, final int cols, final int length,
-                                                final int border) {
+    public Grid(final int rows, final int cols, final int length) {
         this.nodes  = new Node[rows][cols];
         this.rows   = rows;
         this.cols   = cols;
         this.length = length;
-        this.border = border;
     }
 
     /**
@@ -148,14 +137,6 @@ public abstract class Grid {
      */
     public int getCols() {
         return cols;
-    }
-
-    /**
-     * Returns the size of border for each Node.
-     * @return border size of each Node
-     */
-    public int getBorder() {
-        return border;
     }
 
     /**

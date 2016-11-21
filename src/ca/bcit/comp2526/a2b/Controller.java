@@ -7,6 +7,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -21,7 +22,7 @@ import javax.swing.JPanel;
  * Controller.
  *
  * @author  Wei Zhou
- * @version 2016-11-19
+ * @version 2016-11-20
  * @since   2016-11-19
  */
 public class Controller extends JPanel implements NotifyWhenGameOver {
@@ -29,29 +30,42 @@ public class Controller extends JPanel implements NotifyWhenGameOver {
     private static final SpawnType DEFAULT_MAP_TYPE;
     private static final GridType  DEFAULT_GRID_TYPE;
 
+    // frame rate
     private static final TimeUnit TIME_UNIT;
     private static final int      INIT_DELAY;
     private static final int      PERIOD;
 
+    // show avg time taken per turn calculations
+    private static final boolean  SHOW_AVG_TIME_TAKEN;
+    private static final int      AVG_TIME_PER_TURNS;
+
     static {
-        DEFAULT_MAP_TYPE  = SpawnType.NATURAL_SPAWN;
+        DEFAULT_MAP_TYPE  = SpawnType.GIANT_MESS;
         DEFAULT_GRID_TYPE = GridType.SQUARE;
 
+        // frame rate
         TIME_UNIT  = TimeUnit.MILLISECONDS;
         INIT_DELAY = 1500;
         PERIOD     = 50;
+
+        // show avg time taken per turn calculations
+        SHOW_AVG_TIME_TAKEN = false;
+        AVG_TIME_PER_TURNS  = 250;
     }
 
     private final GameFrame                gameFrame;
-    private       ScheduledExecutorService scheduler;
+    private final ScheduledExecutorService scheduler;
     private       ScheduledFuture<?>       futureTask;
     private       boolean                  gameRunning;
 
-    private SpawnType mapType;
-    private GridType  gridType;
+    private       SpawnType                mapType;
+    private       GridType                 gridType;
 
-    private List<JButton> mapButtons;
-    private List<JButton> gridButtons;
+    private final List<JButton>            mapButtons;
+    private final List<JButton>            gridButtons;
+
+    private final List<Long>               timer;
+    private       int                      turnsTimed;
 
     /**
      * Constructor.
@@ -65,8 +79,11 @@ public class Controller extends JPanel implements NotifyWhenGameOver {
         mapButtons  = new ArrayList<JButton>();
         gridButtons = new ArrayList<JButton>();
 
-        mapType  = DEFAULT_MAP_TYPE;
-        gridType = DEFAULT_GRID_TYPE;
+        mapType     = DEFAULT_MAP_TYPE;
+        gridType    = DEFAULT_GRID_TYPE;
+
+        timer       = new ArrayList<Long>();
+        turnsTimed  = 0;
     }
 
     /**
@@ -74,7 +91,7 @@ public class Controller extends JPanel implements NotifyWhenGameOver {
      */
     public void init() {
         if (gameFrame == null) {
-            System.exit(1);
+            throw new IllegalStateException("Controller: can not have null GameFrame");
         }
 
         add(new JLabel("Map:"));
@@ -138,22 +155,55 @@ public class Controller extends JPanel implements NotifyWhenGameOver {
         gameRunning = true;
 
         gameFrame.loadWorld(gridType, mapType);
-
-        final Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                gameFrame.getWorld().takeTurn();
-            }
-        };
-
-        futureTask = scheduler.scheduleAtFixedRate(r, INIT_DELAY, PERIOD, TIME_UNIT);
         gameFrame.getWorld().notifyWhenGameOver(this);
+
+        futureTask = scheduler.scheduleAtFixedRate(new TakeTurn(), INIT_DELAY, PERIOD, TIME_UNIT);
+    }
+
+    /**
+     * Take a turn.
+     */
+    protected class TakeTurn implements Runnable {
+
+        /**
+         * Take a turn.
+         */
+        @Override
+        public void run() {
+            long t1 = 0;
+            long t2;
+
+            if (SHOW_AVG_TIME_TAKEN) {
+                if (++turnsTimed < AVG_TIME_PER_TURNS) {
+                    t1 = new Date().getTime();
+                }
+            }
+
+            gameFrame.getWorld().takeTurn();
+
+            if (SHOW_AVG_TIME_TAKEN) {
+                if (turnsTimed < AVG_TIME_PER_TURNS) {
+                    t2 = new Date().getTime();
+                    long avg = t2 - t1;
+                    timer.add(avg);
+                } else if (turnsTimed == AVG_TIME_PER_TURNS) {
+                    long sum = 0;
+                    for (long time : timer) {
+                        sum += time;
+                    }
+                    long avg = sum / timer.size();
+                    System.out.println("Average time per turn calculations: " + avg + " ms");
+                    turnsTimed = 0;
+                    timer.clear();
+                }
+            }
+        }
     }
 
     // ------------------------------------- NOTIFICATIONS --------------------------------------
 
     /**
-     * Stops the game. Called by outsider when game is over.
+     * Stops the game. Called by World when game is over.
      */
     @Override
     public void gameover() {
@@ -166,7 +216,7 @@ public class Controller extends JPanel implements NotifyWhenGameOver {
     /*
      * ActionListener for loading game.
      */
-    private ActionListener loadGameListener = new ActionListener() {
+    private final ActionListener loadGameListener = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent event) {
             loadgame();
@@ -176,7 +226,7 @@ public class Controller extends JPanel implements NotifyWhenGameOver {
     /*
      * ActionListener for setting mapType.
      */
-    private ActionListener setMapType = new ActionListener() {
+    private final ActionListener setMapType = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent event) {
             final JButton source = (JButton) event.getSource();
@@ -195,7 +245,7 @@ public class Controller extends JPanel implements NotifyWhenGameOver {
     /*
      * ActionListener for setting gridType.
      */
-    private ActionListener setGridType = new ActionListener() {
+    private final ActionListener setGridType = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent event) {
             final JButton source = (JButton) event.getSource();

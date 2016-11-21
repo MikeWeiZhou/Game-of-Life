@@ -2,7 +2,6 @@ package ca.bcit.comp2526.a2b.renderers;
 
 import ca.bcit.comp2526.a2b.World;
 import ca.bcit.comp2526.a2b.grids.Grid;
-import ca.bcit.comp2526.a2b.grids.Node;
 import ca.bcit.comp2526.a2b.lifeforms.Lifeform;
 import ca.bcit.comp2526.a2b.lifeforms.LifeformType;
 
@@ -14,16 +13,10 @@ import java.awt.geom.Rectangle2D;
  * SquareRenderer.
  *
  * @author  Wei Zhou
- * @version 2016-11-19
+ * @version 2016-11-20
  * @since   2016-11-06
  */
 public class SquareRenderer extends Renderer {
-
-    // size of plants (0.1 - 1.0)
-    private static final float PLANT_SIZE  = 1f;
-
-    // size of others (0.1 - 1.0)
-    private static final float OTHER_SIZE = 0.8f;
 
     /**
      * Constructs a new SquareRenderer.
@@ -34,54 +27,51 @@ public class SquareRenderer extends Renderer {
     }
 
     /**
-     * Draws the World.
-     * @param g2           Graphics2D object to draw on
-     * @param grid         structure
-     * @param lifeforms    to draw
+     * Draws full-sized square onto screen.
+     * @param g2     Graphics2D
+     * @param obj    to be drawn
      */
-    public void drawWorld(final Graphics2D g2, final Grid grid,
-                                               final Lifeform[] lifeforms) {
+    @Override
+    public void drawFull(final Graphics2D g2, final Renderable obj) {
+        g2.setPaint(obj.getColor());
+        g2.fill(newSquare(obj.getPoint().x, obj.getPoint().y, obj.getLength()));
+    }
 
-        final double length      = grid.getLength();
-        final double plantLen    = (length * PLANT_SIZE);
-        final double plantOffset = (length - plantLen) / 2;
-        final double otherLen    = (length * OTHER_SIZE);
-        final double otherOffset = (length - otherLen) / 2;
+    /**
+     * Draws mini-sized square onto screen.
+     * @param g2     Graphics2D
+     * @param obj    to be drawn
+     */
+    @Override
+    public void drawMini(final Graphics2D g2, final Renderable obj) {
+        final float ratio = 0.8f;
+        final float length = obj.getLength() * ratio;
+        final float offset = (obj.getLength() - length) / 2;
 
-        // draw Terrains
-        for (int row = 0; row < grid.getRows(); row++) {
-            for (int col = 0; col < grid.getCols(); col++) {
-                Node location = grid.getNodeAt(row, col);
-                g2.setPaint(location.getTerrainColor());
-                g2.fill(new Rectangle2D.Double(
-                        location.getPoint().x,
-                        location.getPoint().y,
-                        length,
-                        length
-                ));
-            }
-        }
+        g2.setPaint(obj.getColor());
+        g2.fill(newSquare(obj.getPoint().x + offset, obj.getPoint().y + offset, length));
+    }
 
-        // draw Lifeforms
-        for (Lifeform lf : lifeforms) {
-            Node location = lf.getLocation();
-            g2.setPaint(lf.getColor());
+    /**
+     * Draws mini-sized circle onto screen.
+     * @param g2     Graphics2D
+     * @param obj    to be drawn
+     */
+    @Override
+    public void drawOtherMini(final Graphics2D g2, final Renderable obj) {
+        final float ratio = 0.8f;
+        final float length = obj.getLength() * ratio;
+        final float offset = (obj.getLength() - length) / 2;
 
-            if (lf.getLifeformType() == LifeformType.PLANT) {
-                g2.fill(new Rectangle2D.Double(
-                        location.getPoint().x + plantOffset,
-                        location.getPoint().y + plantOffset,
-                        plantLen,
-                        plantLen
-                ));
-            } else {
-                g2.fill(new Ellipse2D.Double(
-                        location.getPoint().x + otherOffset,
-                        location.getPoint().y + otherOffset,
-                        otherLen,
-                        otherLen
-                ));
-            }
-        }
+        g2.setPaint(obj.getColor());
+        g2.fill(newCircle(obj.getPoint().x + offset, obj.getPoint().y + offset, length));
+    }
+
+    private Rectangle2D newSquare(final float px, final float py, final float length) {
+        return new Rectangle2D.Double(px, py, length, length);
+    }
+
+    private Ellipse2D newCircle(final float px, final float py, final float length) {
+        return new Ellipse2D.Double(px, py, length, length);
     }
 }

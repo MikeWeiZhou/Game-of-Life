@@ -1,6 +1,7 @@
 package ca.bcit.comp2526.a2b.grids;
 
 import ca.bcit.comp2526.a2b.lifeforms.Lifeform;
+import ca.bcit.comp2526.a2b.renderers.Renderable;
 
 import java.awt.Color;
 import java.awt.Point;
@@ -11,10 +12,10 @@ import java.util.Map;
  * Node.
  *
  * @author  Wei Zhou
- * @version 2016-11-18
+ * @version 2016-11-20
  * @since   2016-11-06
  */
-public class Node {
+public class Node implements Renderable {
 
     private static final Map<Terrain, Color> TERRAIN_COLOR;
 
@@ -28,6 +29,7 @@ public class Node {
     private final Point    point;
     private final int      row;
     private final int      col;
+    private final int      length;
     private       Terrain  terrain;
     private       Lifeform inhabitant;
 
@@ -36,12 +38,14 @@ public class Node {
      * @param point        x, y coordinates of this Node
      * @param row          of this Node
      * @param col          of this Node
+     * @param length       of this Node
      */
-    public Node(final Point point, final int row, final int col) {
+    public Node(final Point point, final int row, final int col, final int length) {
         this.neighbors      = new HashMap<Integer, Node[]>();
         this.point          = point;
         this.row            = row;
         this.col            = col;
+        this.length         = length;
     }
 
     // ------------------------------------------- SETTERS -----------------------------------------
@@ -125,7 +129,8 @@ public class Node {
      * Returns the Color of the Terrain.
      * @return Terrain Color
      */
-    public Color getTerrainColor() {
+    @Override
+    public Color getColor() {
         return TERRAIN_COLOR.get(terrain);
     }
 
@@ -133,8 +138,14 @@ public class Node {
      * Returns the Point of this Node.
      * @return the Point
      */
+    @Override
     public Point getPoint() {
         return point;
+    }
+
+    @Override
+    public int getLength() {
+        return length;
     }
 
     /**

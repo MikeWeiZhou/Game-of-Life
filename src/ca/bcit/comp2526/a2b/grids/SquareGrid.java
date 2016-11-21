@@ -14,8 +14,6 @@ import java.util.List;
  */
 public class SquareGrid extends Grid {
 
-    private static final int BORDER_SIZE = 0;
-
     /**
      * Constructs a Grid with the specified row and column.
      * @param rows      to create
@@ -23,7 +21,7 @@ public class SquareGrid extends Grid {
      * @param length    of Node
      */
     public SquareGrid(final int rows, final int cols, final int length) {
-        super(rows, cols, length, BORDER_SIZE);
+        super(rows, cols, length);
     }
 
     /**
@@ -31,8 +29,8 @@ public class SquareGrid extends Grid {
      * @return Dimension
      */
     protected Dimension calcSize(int length) {
-        final int width  = (length * getRows()) + (BORDER_SIZE * (getRows() + 1));
-        final int height = (length * getCols()) + (BORDER_SIZE * (getCols() + 1));
+        final int width  = length * getRows();
+        final int height = length * getCols();
         return new Dimension(width, height);
     }
 
@@ -43,9 +41,9 @@ public class SquareGrid extends Grid {
      * @return new Node
      */
     protected Node createNodeAt(final int row, final int col) {
-        final int x = (row * getLength()) + ((row + 1) * BORDER_SIZE);
-        final int y = (col * getLength()) + ((col + 1) * BORDER_SIZE);
-        return new Node(new Point(x, y), row, col);
+        final int x = row * getLength();
+        final int y = col * getLength();
+        return new Node(new Point(x, y), row, col, getLength());
     }
 
     /**

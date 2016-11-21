@@ -8,12 +8,13 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
 import javax.swing.JFrame;
+import javax.swing.WindowConstants;
 
 /**
  * GameFrame.
  *
  * @author  Wei Zhou
- * @version 2016-11-19
+ * @version 2016-11-20
  * @since   2016-11-06
  */
 public final class GameFrame extends JFrame {
@@ -51,7 +52,7 @@ public final class GameFrame extends JFrame {
         pack();
 
         setLocation(centerOnScreen(world.getGrid().getSize()));
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
     }
 
@@ -69,16 +70,25 @@ public final class GameFrame extends JFrame {
      * @param spawnType    to load
      */
     public void loadWorld(final GridType gridType, final SpawnType spawnType) {
-        if (this.world != null) {
+        if (gridType == null) {
+            throw new IllegalStateException("GameFrame: failed to load World with a null GridType");
+        }
+        if (spawnType == null) {
+            throw new IllegalStateException("GameFrame: failed to load World with a null "
+                    + "SpawnType");
+        }
+
+        final World newWorld;
+
+        if (world != null) {
             remove(this.world.getRenderer());
         }
 
-        final World world = new World(gridType, spawnType);
-        world.init();
+        newWorld = new World(gridType, spawnType);
+        newWorld.init();
+        add(newWorld.getRenderer(), BorderLayout.CENTER);
 
-        this.world = world;
-        add(world.getRenderer(), BorderLayout.CENTER);
-
+        world = newWorld;
         revalidate();
     }
 
