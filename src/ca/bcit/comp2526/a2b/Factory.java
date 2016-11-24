@@ -5,7 +5,6 @@ import ca.bcit.comp2526.a2b.grids.GridType;
 import ca.bcit.comp2526.a2b.grids.SquareGrid;
 import ca.bcit.comp2526.a2b.renderers.Renderer;
 import ca.bcit.comp2526.a2b.renderers.SquareRenderer;
-import ca.bcit.comp2526.a2b.spawns.AllIDoIsEat;
 import ca.bcit.comp2526.a2b.spawns.ChainReaction;
 import ca.bcit.comp2526.a2b.spawns.GiantMess;
 import ca.bcit.comp2526.a2b.spawns.Spawn;
@@ -37,9 +36,8 @@ public final class Factory {
         RENDERER_CLASSES.put(GridType.SQUARE, SquareRenderer.class);
 
         SPAWN_CLASSES = new HashMap<SpawnType, Class<? extends Spawn>>();
-        SPAWN_CLASSES.put(SpawnType.GIANT_MESS,      GiantMess.class);
-        SPAWN_CLASSES.put(SpawnType.ALL_I_DO_IS_EAT, AllIDoIsEat.class);
-        SPAWN_CLASSES.put(SpawnType.CHAIN_REACTION,  ChainReaction.class);
+        SPAWN_CLASSES.put(SpawnType.GIANT_MESS,     GiantMess.class);
+        SPAWN_CLASSES.put(SpawnType.CHAIN_REACTION, ChainReaction.class);
     }
 
     /**

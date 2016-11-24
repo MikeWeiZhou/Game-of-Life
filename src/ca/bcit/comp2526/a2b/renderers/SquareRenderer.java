@@ -1,9 +1,6 @@
 package ca.bcit.comp2526.a2b.renderers;
 
 import ca.bcit.comp2526.a2b.World;
-import ca.bcit.comp2526.a2b.grids.Grid;
-import ca.bcit.comp2526.a2b.lifeforms.Lifeform;
-import ca.bcit.comp2526.a2b.lifeforms.LifeformType;
 
 import java.awt.Graphics2D;
 import java.awt.geom.Ellipse2D;
@@ -32,9 +29,9 @@ public class SquareRenderer extends Renderer {
      * @param obj    to be drawn
      */
     @Override
-    public void drawFull(final Graphics2D g2, final Renderable obj) {
+    public void drawBackgroundShape(final Graphics2D g2, final Renderable obj) {
         g2.setPaint(obj.getColor());
-        g2.fill(newSquare(obj.getPoint().x, obj.getPoint().y, obj.getLength()));
+        g2.fill(newSquare(obj.getPoint().x, obj.getPoint().y, obj.getSize()));
     }
 
     /**
@@ -43,10 +40,10 @@ public class SquareRenderer extends Renderer {
      * @param obj    to be drawn
      */
     @Override
-    public void drawMini(final Graphics2D g2, final Renderable obj) {
+    public void drawMiniBackgroundShape(final Graphics2D g2, final Renderable obj) {
         final float ratio = 0.8f;
-        final float length = obj.getLength() * ratio;
-        final float offset = (obj.getLength() - length) / 2;
+        final float length = obj.getSize() * ratio;
+        final float offset = (obj.getSize() - length) / 2;
 
         g2.setPaint(obj.getColor());
         g2.fill(newSquare(obj.getPoint().x + offset, obj.getPoint().y + offset, length));
@@ -58,19 +55,33 @@ public class SquareRenderer extends Renderer {
      * @param obj    to be drawn
      */
     @Override
-    public void drawOtherMini(final Graphics2D g2, final Renderable obj) {
+    public void drawForegroundShape(final Graphics2D g2, final Renderable obj) {
         final float ratio = 0.8f;
-        final float length = obj.getLength() * ratio;
-        final float offset = (obj.getLength() - length) / 2;
+        final float length = obj.getSize() * ratio;
+        final float offset = (obj.getSize() - length) / 2;
 
         g2.setPaint(obj.getColor());
         g2.fill(newCircle(obj.getPoint().x + offset, obj.getPoint().y + offset, length));
     }
 
+    /*
+     * Returns a new Rectangle that is a square.
+     * @param px        top left x coordinate
+     * @param py        top left y coordinate
+     * @param length    of each side
+     * @return a Rectangle
+     */
     private Rectangle2D newSquare(final float px, final float py, final float length) {
         return new Rectangle2D.Double(px, py, length, length);
     }
 
+    /*
+     * Returns a new Ellipse that is a circle.
+     * @param px        top left x coordinate
+     * @param py        top left x coordinate
+     * @param length    length of the circle (2 x radius)
+     * @return a new Ellipse
+     */
     private Ellipse2D newCircle(final float px, final float py, final float length) {
         return new Ellipse2D.Double(px, py, length, length);
     }

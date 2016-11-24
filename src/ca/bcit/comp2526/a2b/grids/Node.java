@@ -152,7 +152,7 @@ public class Node implements Renderable {
     }
 
     @Override
-    public int getLength() {
+    public int getSize() {
         return length;
     }
 

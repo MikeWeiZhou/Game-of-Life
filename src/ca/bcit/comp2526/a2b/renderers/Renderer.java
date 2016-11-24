@@ -19,12 +19,15 @@ import javax.swing.JPanel;
  * Renderer.
  *
  * @author  Wei Zhou
- * @version 2016-11-20
+ * @version 2016-11-23
  * @since   2016-11-06
  */
 public abstract class Renderer extends JPanel implements NotifyWhenGameOver {
 
+    private static final String WORLDMAP_FILENAME = "worldmap.jpg";
+
     private final World   world;
+    private final Grid    grid;
     private       boolean gameover;
 
     /**
@@ -33,6 +36,7 @@ public abstract class Renderer extends JPanel implements NotifyWhenGameOver {
      */
     public Renderer(final World world) {
         this.world = world;
+        grid       = world.getGrid();
         gameover   = false;
     }
 
@@ -57,16 +61,17 @@ public abstract class Renderer extends JPanel implements NotifyWhenGameOver {
      * Draws the World onto frame.
      * @param graphics    object
      */
+    @Override
     public void paint(final Graphics graphics) {
         final Graphics2D g2 = (Graphics2D) graphics;
         setGraphicsOptions(g2);
 
         if (gameover) {
             drawWorldMap(g2);
-        } else {
-            drawWorld(g2, world.getGrid(), world.getLifeforms());
+            return;
         }
 
+        drawWorld(g2, grid, world.getLifeforms());
     }
 
     /*
@@ -80,7 +85,7 @@ public abstract class Renderer extends JPanel implements NotifyWhenGameOver {
         // draw Terrain
         for (int row = 0; row < grid.getRows(); row++) {
             for (int col = 0; col < grid.getCols(); col++) {
-                drawFull(g2, grid.getNodeAt(row, col));
+                drawBackgroundShape(g2, grid.getNodeAt(row, col));
             }
         }
 
@@ -94,9 +99,9 @@ public abstract class Renderer extends JPanel implements NotifyWhenGameOver {
             }
 
             if (lf.getLifeformType() == LifeformType.PLANT) {
-                drawFull(g2, lf);
+                drawBackgroundShape(g2, lf);
             } else {
-                drawOtherMini(g2, lf);
+                drawForegroundShape(g2, lf);
             }
         }
     }
@@ -106,18 +111,16 @@ public abstract class Renderer extends JPanel implements NotifyWhenGameOver {
      * @param g2    Graphics2D
      */
     private void drawWorldMap(final Graphics2D g2) {
-        final String filename = "worldmap.jpg";
-
         try {
-            BufferedImage img = ImageIO.read(new File(filename));
+            BufferedImage img = ImageIO.read(new File(WORLDMAP_FILENAME));
 
-            final int width  = (int) world.getGrid().getSize().getWidth();
-            final int height = (int) world.getGrid().getSize().getHeight();
+            final int width  = (int) grid.getSize().getWidth();
+            final int height = (int) grid.getSize().getHeight();
 
             g2.drawImage(img, 0, 0, width, height, null);
         } catch (final IOException ex) {
-            System.err.println("Renderer: can not find " + filename);
-            System.err.println("God damn it, who deleted my " + filename + "!?!?");
+            System.err.println("Renderer: can not find " + WORLDMAP_FILENAME);
+            System.err.println("God damn it, who deleted my " + WORLDMAP_FILENAME + "!?!?");
         }
     }
 
@@ -126,7 +129,7 @@ public abstract class Renderer extends JPanel implements NotifyWhenGameOver {
     /**
      * Game is over. Called by World to signal game over.
      */
-    public void gameover() {
+    public void gameOver() {
         gameover = true;
         update();
     }
@@ -138,21 +141,21 @@ public abstract class Renderer extends JPanel implements NotifyWhenGameOver {
      * @param g2     Graphics2D
      * @param obj    to be drawn
      */
-    public abstract void drawFull(final Graphics2D g2, final Renderable obj);
+    public abstract void drawBackgroundShape(final Graphics2D g2, final Renderable obj);
 
     /**
      * Draws mini-sized shape onto screen.
      * @param g2     Graphics2D
      * @param obj    to be drawn
      */
-    public abstract void drawMini(final Graphics2D g2, final Renderable obj);
+    public abstract void drawMiniBackgroundShape(final Graphics2D g2, final Renderable obj);
 
     /**
      * Draws mini-sized other shape onto screen.
      * @param g2     Graphics2D
      * @param obj    to be drawn
      */
-    public abstract void drawOtherMini(final Graphics2D g2, final Renderable obj);
+    public abstract void drawForegroundShape(final Graphics2D g2, final Renderable obj);
 
     // ----------------------------------------- OPTIONS -------------------------------------------
 

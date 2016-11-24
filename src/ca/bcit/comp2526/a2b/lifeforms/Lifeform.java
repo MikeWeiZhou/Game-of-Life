@@ -406,8 +406,8 @@ public abstract class Lifeform implements Renderable {
      * @return length
      */
     @Override
-    public int getLength() {
-        return getLocation().getLength();
+    public int getSize() {
+        return getLocation().getSize();
     }
 
     /**

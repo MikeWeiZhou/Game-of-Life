@@ -19,10 +19,10 @@ public interface Renderable {
     Color getColor();
 
     /**
-     * Returns the length of Renderable object.
+     * Returns the size of Renderable object.
      * @return length
      */
-    int getLength();
+    int getSize();
 
     /**
      * Returns the Point of Renderable object.

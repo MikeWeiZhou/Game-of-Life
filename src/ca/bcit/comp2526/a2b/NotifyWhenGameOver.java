@@ -9,5 +9,5 @@ package ca.bcit.comp2526.a2b;
  */
 public interface NotifyWhenGameOver {
 
-    void gameover();
+    void gameOver();
 }

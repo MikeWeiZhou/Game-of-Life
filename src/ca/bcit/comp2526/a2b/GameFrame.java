@@ -1,6 +1,7 @@
 package ca.bcit.comp2526.a2b;
 
 import ca.bcit.comp2526.a2b.grids.GridType;
+import ca.bcit.comp2526.a2b.renderers.Renderer;
 import ca.bcit.comp2526.a2b.spawns.SpawnType;
 
 import java.awt.BorderLayout;
@@ -14,7 +15,7 @@ import javax.swing.WindowConstants;
  * GameFrame.
  *
  * @author  Wei Zhou
- * @version 2016-11-20
+ * @version 2016-11-23
  * @since   2016-11-06
  */
 public final class GameFrame extends JFrame {
@@ -62,6 +63,14 @@ public final class GameFrame extends JFrame {
      */
     public World getWorld() {
         return world;
+    }
+
+    /**
+     * Returns the current Renderer for the World.
+     * @return Renderer
+     */
+    public Renderer getRenderer() {
+        return getWorld().getRenderer();
     }
 
     /**

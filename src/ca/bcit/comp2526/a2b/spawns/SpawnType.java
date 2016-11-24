@@ -13,10 +13,7 @@ public enum SpawnType {
     GIANT_MESS("Giant Mess"),
 
     /** ChainReaction. */
-    CHAIN_REACTION("Chain Reaction"),
-
-    /** AllIDoIsEat. */
-    ALL_I_DO_IS_EAT("All I Do Is Eat");
+    CHAIN_REACTION("Chain Reaction");
 
     private final String name;
 

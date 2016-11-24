@@ -161,8 +161,8 @@ public abstract class Spawn {
      * @param probability    of terraforming
      */
     private void terraformAt(final Node location, final float probability) {
-        final Node[]  neighbors;
-        final boolean chance;
+        final Node[] neighbors;
+        final float  chance;
         int neighborsAlike = 0;
 
         // count neighbors with same Terrain
@@ -174,8 +174,8 @@ public abstract class Spawn {
         }
 
         // terraform if probability is right and we didn't exceed #s for this type of Terrain
-        chance = random.nextFloat() <= (probability + (neighborsAlike / neighbors.length));
-        if (chance && terraformPermitted()) {
+        chance = probability + (neighborsAlike / neighbors.length);
+        if (random.nextFloat() <= chance && terraformPermitted()) {
             location.setTerrain(terraformTerrain);
             for (Node neighbor : neighbors) {
                 if (!neighbor.hasTerrain()) {

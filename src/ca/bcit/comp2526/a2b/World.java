@@ -174,7 +174,7 @@ public class World {
      */
     private void notifyObservers() {
         for (NotifyWhenGameOver observer : observers) {
-            observer.gameover();
+            observer.gameOver();
         }
     }
 
