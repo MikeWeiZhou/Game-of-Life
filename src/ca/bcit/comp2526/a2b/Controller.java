@@ -217,7 +217,7 @@ public class Controller extends JPanel implements NotifyWhenGameOver {
      */
     private void addReloadButton() {
         final JButton button = new JButton("Reload");
-        button.addActionListener(loadGameListener);
+        button.addActionListener(event -> loadGame());
         add(button);
     }
 
@@ -227,17 +227,8 @@ public class Controller extends JPanel implements NotifyWhenGameOver {
     private void addAutomateTurnButton() {
         final String  label  = automateTurns ? "Manual Turn Taking" : "Auto Turn Taking";
         final JButton button = new JButton(label);
-        button.addActionListener(toggleTakeTurnAutomationListener);
+        button.addActionListener(this::turnTakingButtonPressed);
         add(button);
-    }
-
-    /*
-     * Adds blank space.
-     */
-    private void addBlankSpace() {
-        final int blocksize = 50;
-        final int height    = 1;
-        add(Box.createRigidArea(new Dimension(blocksize, height)));
     }
 
     /*
@@ -248,7 +239,7 @@ public class Controller extends JPanel implements NotifyWhenGameOver {
         for (SpawnType map : SpawnType.values()) {
             final JButton button = new JButton(map.getName());
             mapButtons.add(button);
-            button.addActionListener(setMapType);
+            button.addActionListener(this::mapChangeButtonPressed);
             button.putClientProperty("type", map);
             add(button);
 
@@ -266,7 +257,7 @@ public class Controller extends JPanel implements NotifyWhenGameOver {
         for (GridType type : GridType.values()) {
             final JButton button = new JButton(type.getName());
             gridButtons.add(button);
-            button.addActionListener(setGridType);
+            button.addActionListener(this::gridChangeButtonPressed);
             button.putClientProperty("type", type);
             add(button);
 
@@ -274,6 +265,61 @@ public class Controller extends JPanel implements NotifyWhenGameOver {
                 button.setEnabled(false);
             }
         }
+    }
+
+    /*
+     * Adds blank space.
+     */
+    private void addBlankSpace() {
+        final int blocksize = 50;
+        final int height    = 1;
+        add(Box.createRigidArea(new Dimension(blocksize, height)));
+    }
+
+    // ---------------------------------------- BUTTON PRESSED -------------------------------------
+
+    /*
+     * Toggle turn taking automation.
+     * @param event    ActionEvent
+     */
+    private void turnTakingButtonPressed(final ActionEvent event) {
+        toggleTakeTurnAutomation();
+        String newLabel = automateTurns ? "Manual Turn Taking" : "Auto Turn Taking";
+        ((JButton) (event.getSource())).setText(newLabel);
+    }
+
+    /*
+     * Change the map.
+     * @param event    ActionEvent
+     */
+    private void mapChangeButtonPressed(final ActionEvent event) {
+        final JButton source = (JButton) event.getSource();
+        for (JButton button : mapButtons) {
+            if (source.equals(button)) {
+                button.setEnabled(false);
+                mapType = (SpawnType) button.getClientProperty("type");
+            } else {
+                button.setEnabled(true);
+            }
+        }
+        loadGame();
+    }
+
+    /*
+     * Change the grid type.
+     * @param event    ActionEvent
+     */
+    private void gridChangeButtonPressed(final ActionEvent event) {
+        final JButton source = (JButton) event.getSource();
+        for (JButton button : gridButtons) {
+            if (source.equals(button)) {
+                button.setEnabled(false);
+                gridType = (GridType) button.getClientProperty("type");
+            } else {
+                button.setEnabled(true);
+            }
+        }
+        loadGame();
     }
 
     // ---------------------------------------- NOTIFICATIONS --------------------------------------
@@ -287,7 +333,7 @@ public class Controller extends JPanel implements NotifyWhenGameOver {
         gameRunning = false;
     }
 
-    // -------------------------------------- INNER CLASSES ----------------------------------------
+    // -------------------------------------- TURN LISTENER ----------------------------------------
 
     /*
      * Schedulable take turn listener.
@@ -303,66 +349,4 @@ public class Controller extends JPanel implements NotifyWhenGameOver {
             takeTurn();
         }
     }
-
-    /*
-     * ActionListener for toggling take turn automation.
-     */
-    private ActionListener toggleTakeTurnAutomationListener = new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent event) {
-            final String label;
-
-            toggleTakeTurnAutomation();
-            label = automateTurns ? "Manual Turn Taking" : "Auto Turn Taking";
-            ((JButton) (event.getSource())).setText(label);
-        }
-    };
-
-    /*
-     * ActionListener for loading game.
-     */
-    private ActionListener loadGameListener = new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent event) {
-            loadGame();
-        }
-    };
-
-    /*
-     * ActionListener for setting mapType.
-     */
-    private final ActionListener setMapType = new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent event) {
-            final JButton source = (JButton) event.getSource();
-            for (JButton button : mapButtons) {
-                if (source.equals(button)) {
-                    button.setEnabled(false);
-                    mapType = (SpawnType) button.getClientProperty("type");
-                } else {
-                    button.setEnabled(true);
-                }
-            }
-            loadGame();
-        }
-    };
-
-    /*
-     * ActionListener for setting gridType.
-     */
-    private final ActionListener setGridType = new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent event) {
-            final JButton source = (JButton) event.getSource();
-            for (JButton button : gridButtons) {
-                if (source.equals(button)) {
-                    button.setEnabled(false);
-                    gridType = (GridType) button.getClientProperty("type");
-                } else {
-                    button.setEnabled(true);
-                }
-            }
-            loadGame();
-        }
-    };
 }
