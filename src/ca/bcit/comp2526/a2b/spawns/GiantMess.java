@@ -33,6 +33,6 @@ public class GiantMess extends Spawn {
         addMortalityRate(LifeformType.PLANT,     0.01f);
         addMortalityRate(LifeformType.HERBIVORE, 0.2f);
         addMortalityRate(LifeformType.CARNIVORE, 0.0000001f);
-        addMortalityRate(LifeformType.OMNIVORE,  0.063f);
+        addMortalityRate(LifeformType.OMNIVORE,  0.064f);
     }
 }

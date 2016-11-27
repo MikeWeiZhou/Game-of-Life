@@ -5,7 +5,6 @@ import ca.bcit.comp2526.a2b.spawns.SpawnType;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -53,7 +52,7 @@ public class Controller extends JPanel implements NotifyWhenGameOver {
         PERIOD     = 50;
 
         // show avg time taken per turn calculations
-        SHOW_AVG_TIME_TAKEN = false;
+        SHOW_AVG_TIME_TAKEN = true;
         AVG_TIME_PER_TURNS  = 250;
     }
 
@@ -346,7 +345,7 @@ public class Controller extends JPanel implements NotifyWhenGameOver {
 
         @Override
         public void mouseClicked(final MouseEvent event) {
-            takeTurn();
+            run();
         }
     }
 }

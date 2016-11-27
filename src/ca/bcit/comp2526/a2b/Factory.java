@@ -19,7 +19,7 @@ import java.util.Map;
  * Factory.
  *
  * @author  Wei Zhou
- * @version 2016-11-19
+ * @version 2016-11-24
  * @since   2016-11-19
  */
 public final class Factory {
@@ -88,11 +88,10 @@ public final class Factory {
      * @param <E>           type of Class to be instantiated
      * @return a new instantiation of the specified class
      */
-    public static <E> E createObject(final Class<? extends E> clazz, final Class<?>[] paramTypes,
-                                                                     final Object[]   paramVals) {
+    public static <E> E createObject(final Class<E> clazz, final Class<?>[] paramTypes,
+                                                           final Object[]   paramVals) {
         try {
-            @SuppressWarnings("unchecked")
-            final Constructor<E> constructor = (Constructor<E>) clazz.getConstructor(paramTypes);
+            final Constructor<E> constructor = clazz.getConstructor(paramTypes);
             return constructor.newInstance(paramVals);
         } catch (final NoSuchMethodException ex) {
             System.err.println("Factory: no such constructor in class " + clazz.toString());

@@ -22,7 +22,7 @@ import java.util.Set;
  * World.
  *
  * @author  Wei Zhou
- * @version 2016-11-20
+ * @version 2016-11-23
  * @since   2016-11-06
  */
 public class World {
@@ -31,16 +31,20 @@ public class World {
     private static final int COLS;
     private static final int NODE_LENGTH;
 
-    private static final int MIN_LIFEFORMS;
-    private static final int CHECK_GAMEOVER_INTERVAL;
+    // game over
+    private static final int MIN_NUM_LIFEFORMS;
+    private static final int MIN_NUM_SPECIES;
+    private static final int GAMEOVER_CHECK_INTERVAL;
 
     static {
-        ROWS        = 160;
-        COLS        = 80;
-        NODE_LENGTH = 6;
+        ROWS        = 180;
+        COLS        = 90;
+        NODE_LENGTH = 5;
 
-        MIN_LIFEFORMS           = 5;
-        CHECK_GAMEOVER_INTERVAL = 70;
+        // game over
+        MIN_NUM_LIFEFORMS       = 5;
+        MIN_NUM_SPECIES         = 1;
+        GAMEOVER_CHECK_INTERVAL = 70;
     }
 
     private final Random         random;
@@ -100,7 +104,7 @@ public class World {
      * Takes a turn.
      */
     public void takeTurn() {
-        if (++turnsPassed == CHECK_GAMEOVER_INTERVAL) {
+        if (++turnsPassed == GAMEOVER_CHECK_INTERVAL) {
             checkGameover();
             turnsPassed = 0;
         }
@@ -153,7 +157,7 @@ public class World {
      * Notifies all observers if number of Lifeforms cannot support an ecosystem; Game over.
      */
     private void checkGameover() {
-        if (lifeforms.size() < MIN_LIFEFORMS) {
+        if (lifeforms.size() < MIN_NUM_LIFEFORMS) {
             notifyObservers();
         } else {
             final Set<LifeformType> species = new HashSet<LifeformType>();
@@ -163,7 +167,7 @@ public class World {
                 }
             }
 
-            if (species.size() <= 1) {
+            if (species.size() <= MIN_NUM_SPECIES) {
                 notifyObservers();
             }
         }
