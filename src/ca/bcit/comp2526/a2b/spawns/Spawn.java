@@ -174,7 +174,7 @@ public abstract class Spawn {
         }
 
         // terraform if probability is right and we didn't exceed #s for this type of Terrain
-        chance = probability + (neighborsAlike / neighbors.length);
+        chance = probability + (neighborsAlike / (float) neighbors.length);
         if (random.nextFloat() <= chance && terraformPermitted()) {
             location.setTerrain(terraformTerrain);
             for (Node neighbor : neighbors) {
