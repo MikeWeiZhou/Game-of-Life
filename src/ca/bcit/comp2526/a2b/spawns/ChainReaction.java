@@ -8,7 +8,7 @@ import ca.bcit.comp2526.a2b.lifeforms.LifeformType;
  * ChainReaction.
  *
  * @author  Wei Zhou
- * @version 2016-11-20
+ * @version 2016-11-27
  * @since   2016-11-14
  */
 public class ChainReaction extends Spawn {
@@ -26,7 +26,7 @@ public class ChainReaction extends Spawn {
         addTerraformRate(Terrain.LAND,  0.9f);
 
         addSpawnRate(LifeformType.PLANT,     0.3f);
-        addSpawnRate(LifeformType.CARNIVORE, 0.1f);
+        addSpawnRate(LifeformType.CARNIVORE, 0.06f);
         addSpawnRate(LifeformType.HERBIVORE, 0.12f);
 
         addMortalityRate(LifeformType.PLANT,     0.00001f);

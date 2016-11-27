@@ -24,7 +24,7 @@ import java.util.TreeMap;
  * Spawn.
  *
  * @author  Wei Zhou
- * @version 2016-11-20
+ * @version 2016-11-27
  * @since   2016-11-06
  */
 public abstract class Spawn {
@@ -33,8 +33,8 @@ public abstract class Spawn {
     private static final Map<LifeformType, Class<? extends Lifeform>> CLASSES;
 
     static {
-        // probability of Terrain convergence (0f - 0.99f)
-        TERRAIN_CONVERGENCE_FACTOR = .99f;
+        // probability of Terrain convergence (0f - 0.5f)
+        TERRAIN_CONVERGENCE_FACTOR = .4f;
 
         CLASSES = new HashMap<LifeformType, Class<? extends Lifeform>>();
         CLASSES.put(LifeformType.PLANT,     Plant.class);

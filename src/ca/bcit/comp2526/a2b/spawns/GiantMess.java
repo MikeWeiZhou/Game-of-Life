@@ -8,7 +8,7 @@ import ca.bcit.comp2526.a2b.lifeforms.LifeformType;
  * GiantMess.
  *
  * @author  Wei Zhou
- * @version 2016-11-20
+ * @version 2016-11-27
  * @since   2016-11-08
  */
 public class GiantMess extends Spawn {
@@ -33,6 +33,6 @@ public class GiantMess extends Spawn {
         addMortalityRate(LifeformType.PLANT,     0.01f);
         addMortalityRate(LifeformType.HERBIVORE, 0.2f);
         addMortalityRate(LifeformType.CARNIVORE, 0.0000001f);
-        addMortalityRate(LifeformType.OMNIVORE,  0.064f);
+        addMortalityRate(LifeformType.OMNIVORE,  0.065f);
     }
 }

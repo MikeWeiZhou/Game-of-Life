@@ -23,7 +23,7 @@ import javax.swing.JPanel;
  * Controller.
  *
  * @author  Wei Zhou
- * @version 2016-11-23
+ * @version 2016-11-27
  * @since   2016-11-19
  */
 public class Controller extends JPanel implements NotifyWhenGameOver {
@@ -52,7 +52,7 @@ public class Controller extends JPanel implements NotifyWhenGameOver {
         PERIOD     = 50;
 
         // show avg time taken per turn calculations
-        SHOW_AVG_TIME_TAKEN = true;
+        SHOW_AVG_TIME_TAKEN = false;
         AVG_TIME_PER_TURNS  = 250;
     }
 
